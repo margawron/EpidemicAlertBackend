@@ -8,7 +8,9 @@ spring:
       ddl-auto: update
 
 logging:
-  level: debug
+  level:
+    root: debug
+
 
 server:
   servlet:
@@ -17,7 +19,6 @@ server:
 epidemicalert:
   token:
     expiryTime: 28800 # 8 hours
-
 
 ---
 
