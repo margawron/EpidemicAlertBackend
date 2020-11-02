@@ -7,6 +7,9 @@ spring:
     hibernate:
       ddl-auto: update
 
+logging:
+  level: debug
+
 server:
   servlet:
     context-path: /api

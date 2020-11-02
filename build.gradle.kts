@@ -41,7 +41,6 @@ dependencies {
     annotationProcessor("org.hibernate.validator:hibernate-validator-annotation-processor:6.1.6.Final")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 

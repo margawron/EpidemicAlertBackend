@@ -1,6 +1,7 @@
 package com.github.margawron.epidemicalert.validation
 
 import com.github.margawron.epidemicalert.exceptions.MessageKeyException
+import org.slf4j.LoggerFactory
 import org.springframework.context.MessageSource
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -16,13 +17,20 @@ import javax.validation.ValidationException
 @ControllerAdvice
 class ControllerExceptionHandler(private val messageSource: MessageSource) {
 
+    companion object{
+        val log = LoggerFactory.getLogger(ControllerExceptionHandler::class.java)
+    }
+
     @ExceptionHandler(value = [MessageKeyException::class])
-    fun handleTranslatedException(e: MessageKeyException): ResponseEntity<ErrorDto> =
-            ResponseEntity.badRequest().body(ErrorDto(e.originClass, null, messageSource.getMessage(e.messageKey, e.args, Locale.getDefault())))
+    fun handleTranslatedException(e: MessageKeyException): ResponseEntity<ErrorDto> {
+        log.info("handleTranslateException", e)
+        return ResponseEntity.badRequest().body(ErrorDto(e.originClass, null, messageSource.getMessage(e.messageKey, e.args, Locale.getDefault())))
+    }
 
     @ExceptionHandler(value = [MethodArgumentNotValidException::class])
-    fun handleMethodArgumentNotValid(ex: MethodArgumentNotValidException): ResponseEntity<List<ErrorDto>> {
-        val errors = ex.bindingResult.allErrors.map {
+    fun handleMethodArgumentNotValid(e: MethodArgumentNotValidException): ResponseEntity<List<ErrorDto>> {
+        log.info("handleMethodArgumentNotValid", e)
+        val errors = e.bindingResult.allErrors.map {
             val erroredObject = "Field: ${(it as FieldError).field}"
             ErrorDto(MethodArgumentNotValidException::class.simpleName, erroredObject, it.defaultMessage)
         }
@@ -31,6 +39,7 @@ class ControllerExceptionHandler(private val messageSource: MessageSource) {
 
     @ExceptionHandler(value = [ConstraintViolationException::class])
     fun handleConstraintViolationException(e: ConstraintViolationException): ResponseEntity<List<ErrorDto>> {
+        log.info("handleConstraintViolationException", e)
         val errors = e.constraintViolations.map {
             val message = it.message
             val erroredObject = "Field: ${it.propertyPath}, Invalid value: ${it.invalidValue}"
@@ -40,15 +49,19 @@ class ControllerExceptionHandler(private val messageSource: MessageSource) {
     }
 
     @ExceptionHandler(value = [ValidationException::class])
-    fun handleValidationException(e: ValidationException): ResponseEntity<ErrorDto> =
-            ResponseEntity.badRequest().body(ErrorDto(ValidationException::class.simpleName, null, e.message))
-
+    fun handleValidationException(e: ValidationException): ResponseEntity<ErrorDto> {
+        log.info("handleValidationException", e)
+        return ResponseEntity.badRequest().body(ErrorDto(ValidationException::class.simpleName, null, e.message))
+    }
     @ExceptionHandler(value = [NoSuchElementException::class])
-    fun handleNoSuchElementException(e: NoSuchElementException): ResponseEntity<ErrorDto> =
-            ResponseEntity(ErrorDto(NoSuchElementException::class.simpleName, null, e.message), HttpStatus.NOT_FOUND)
+    fun handleNoSuchElementException(e: NoSuchElementException): ResponseEntity<ErrorDto> {
+        log.info("handleNoSuchElementException", e)
+        return ResponseEntity(ErrorDto(NoSuchElementException::class.simpleName, null, e.message), HttpStatus.NOT_FOUND)
+    }
 
     @ExceptionHandler(value = [CredentialException::class])
-    fun handleCredentialException(e: CredentialException): ResponseEntity<ErrorDto> =
-            ResponseEntity.badRequest().body(ErrorDto(CredentialException::class.simpleName, null, e.message))
-
+    fun handleCredentialException(e: CredentialException): ResponseEntity<ErrorDto> {
+        log.info("handleCredentialException", e)
+        return ResponseEntity.badRequest().body(ErrorDto(CredentialException::class.simpleName, null, e.message))
+    }
 }
