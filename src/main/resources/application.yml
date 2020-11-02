@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    # password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+server:
+  servlet:
+    context-path: /api
+
+epidemicalert:
+  token:
+    expiryTime: 28800 # 8 hours
+
+
+---
+
+spring:
+  profiles: dev
+  datasource:
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/postgres
+
+JWT_SECRET: v1FEIolJXq2pKTtnzVtztbbL1RBf10Q6f56ImIZoj21nznP9rOdRN4dQ1iHrS494
+
+---
+
+spring:
+  profiles: prod
+  datasource:
+    password: ${PROD_DB_PASS}
+    url: jdbc:postgresql://database-1.cw4vm04axn85.eu-west-1.rds.amazonaws.com:5432/postgres
+
+JWT_SECRET: Kj0ALWWB5PsZboojLMt24OXfSmjOQLUwC1EQFcnV9gA9E2KkDbxjT93SqZyUqr42
