@@ -7,11 +7,6 @@ spring:
     hibernate:
       ddl-auto: update
 
-logging:
-  level:
-    root: debug
-
-
 server:
   servlet:
     context-path: /api
@@ -26,7 +21,7 @@ spring:
   profiles: dev
   datasource:
     password: postgres
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5432/epidemicalert
 
 JWT_SECRET: v1FEIolJXq2pKTtnzVtztbbL1RBf10Q6f56ImIZoj21nznP9rOdRN4dQ1iHrS494
 
@@ -35,8 +30,9 @@ JWT_SECRET: v1FEIolJXq2pKTtnzVtztbbL1RBf10Q6f56ImIZoj21nznP9rOdRN4dQ1iHrS494
 spring:
   profiles: prod
   datasource:
-    url: ${JDBC_DATABASE_URL}
-    username: ${JDBC_DATABASE_USERNAME}
-    password: ${JDBC_DATABASE_PASSWORD}
+    url: jdbc:postgresql://database-1.cw4vm04axn85.eu-west-1.rds.amazonaws.com/postgres
+    username: postgres
+    password: epidemicalerthardpassword
+
 
 JWT_SECRET: Kj0ALWWB5PsZboojLMt24OXfSmjOQLUwC1EQFcnV9gA9E2KkDbxjT93SqZyUqr42
