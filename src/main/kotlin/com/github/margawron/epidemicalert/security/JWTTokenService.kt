@@ -49,7 +49,7 @@ class JWTTokenService(
 
         val tokenExpirationDate = jwsClaims.body.expiration
 
-        return if (tokenExpirationDate.before(Date.from(Instant.now()))) userService.findUserByUsername(jwsClaims.body.get("username", String::class.java))
+        return if (tokenExpirationDate.after(Date.from(Instant.now()))) userService.findUserByUsername(jwsClaims.body.get("username", String::class.java))
         else throw ExpiredJwtException(jwsClaims.header, jwsClaims.body, messageSource.getMessage("token.expired", null, Locale.getDefault()))
     }
 }
