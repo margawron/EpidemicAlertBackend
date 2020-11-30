@@ -18,21 +18,27 @@ epidemicalert:
 ---
 
 spring:
-  profiles: dev
   datasource:
     password: postgres
     url: jdbc:postgresql://localhost:5432/epidemicalert
+  config:
+    activate:
+      on-profile: dev
 
 JWT_SECRET: v1FEIolJXq2pKTtnzVtztbbL1RBf10Q6f56ImIZoj21nznP9rOdRN4dQ1iHrS494
 
 ---
 
 spring:
-  profiles: prod
   datasource:
     url: jdbc:postgresql://database-1.cw4vm04axn85.eu-west-1.rds.amazonaws.com/postgres
     username: postgres
     password: epidemicalerthardpassword
+  config:
+    activate:
+      on-profile: prod
 
+server:
+  port: 80
 
 JWT_SECRET: Kj0ALWWB5PsZboojLMt24OXfSmjOQLUwC1EQFcnV9gA9E2KkDbxjT93SqZyUqr42
