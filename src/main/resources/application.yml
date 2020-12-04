@@ -39,6 +39,13 @@ spring:
       on-profile: prod
 
 server:
-  port: 80
+  port: 443
+  ssl:
+    key-store:
+      epidemicalert.tk.p12
+    key-store-password:
+      changeit
+    keyStoreType:
+      PKCS12
 
 JWT_SECRET: Kj0ALWWB5PsZboojLMt24OXfSmjOQLUwC1EQFcnV9gA9E2KkDbxjT93SqZyUqr42
