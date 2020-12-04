@@ -14,6 +14,7 @@ class SwaggerConfig {
     @Bean
     fun api(): Docket =
         Docket(DocumentationType.SWAGGER_2)
+            .host("https://epidemicalert.tk/api/")
             .select()
             .apis(RequestHandlerSelectors.basePackage("com.github.margawron.epidemicalert"))
             .apis(RequestHandlerSelectors.withMethodAnnotation(RequestMapping::class.java))

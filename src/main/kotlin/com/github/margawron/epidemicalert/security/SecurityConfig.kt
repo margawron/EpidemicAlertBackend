@@ -12,6 +12,15 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 class SecurityConfig(private val tokenService: JWTTokenService) : WebSecurityConfigurerAdapter() {
 
+    companion object {
+        val SWAGGER_UI_ANT_MATCHERS = arrayOf(
+            "/swagger-ui/**",
+            "/webjars/**",
+            "/v2/**",
+            "/swagger-resources/**"
+        )
+    }
+
     override fun configure(http: HttpSecurity) {
         http {
             csrf {
@@ -23,12 +32,7 @@ class SecurityConfig(private val tokenService: JWTTokenService) : WebSecurityCon
             authorizeRequests {
                 authorize("/register/**", permitAll)
                 authorize("/auth/**", permitAll)
-                // Swagger dependencies
-                authorize("/swagger-ui/**", permitAll)
-                authorize("/webjars/**", permitAll)
-                authorize("/v2/**", permitAll)
-                authorize("/swagger-resources/**", permitAll)
-
+                SWAGGER_UI_ANT_MATCHERS.forEach { authorize(it, permitAll) }
                 authorize(anyRequest, authenticated)
             }
             addFilterAt(JwtAuthenticationFilter(tokenService), BasicAuthenticationFilter::class.java)
