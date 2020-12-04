@@ -1,12 +1,11 @@
 package com.github.margawron.epidemicalert.users
 
-import com.github.margawron.epidemicalert.security.PermissionEvaluator
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class UserController(private val permissionEvaluator: PermissionEvaluator) {
+class UserController {
 
     @GetMapping("/user")
     @PreAuthorize("@permissionEvaluator.isUser(authentication)")

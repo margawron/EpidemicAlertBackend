@@ -1,9 +1,11 @@
 package com.github.margawron.epidemicalert.users
 
+import io.swagger.annotations.ApiModel
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.Size
 
+@ApiModel(value= "Register Request")
 class RegistrationDto(
 
         @NotEmpty(message = "{login.required}")

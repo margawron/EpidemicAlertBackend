@@ -15,15 +15,15 @@ class AuthController(private val userService: UserService,
                      private val tokenService: JWTTokenService) {
 
     @PostMapping(value = ["/register/"])
-    fun register(@Valid @RequestBody dto: RegistrationDto): ResponseEntity<UserDto> {
-        val createdUser = userService.createAndSaveAccount(dto)
+    fun register(@Valid @RequestBody registrationRequest: RegistrationDto): ResponseEntity<UserDto> {
+        val createdUser = userService.createAndSaveAccount(registrationRequest)
         val userDto = UserDto.fromEntity(createdUser)
         return ResponseEntity.ok().body(userDto)
     }
 
     @PostMapping(value = ["/auth/"])
-    fun generateToken(@Valid @RequestBody loginDto: LoginDto): TokenResponse {
-        val user = userService.findAndCheckUserCredentials(loginDto)
+    fun generateToken(@Valid @RequestBody loginRequest: LoginDto): TokenResponse {
+        val user = userService.findAndCheckUserCredentials(loginRequest)
         val token = tokenService.generateToken(user)
         return TokenResponse(token)
     }

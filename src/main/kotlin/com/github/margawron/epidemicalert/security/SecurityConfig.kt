@@ -23,6 +23,12 @@ class SecurityConfig(private val tokenService: JWTTokenService) : WebSecurityCon
             authorizeRequests {
                 authorize("/register/**", permitAll)
                 authorize("/auth/**", permitAll)
+                // Swagger dependencies
+                authorize("/swagger-ui/**", permitAll)
+                authorize("/webjars/**", permitAll)
+                authorize("/v2/**", permitAll)
+                authorize("/swagger-resources/**", permitAll)
+
                 authorize(anyRequest, authenticated)
             }
             addFilterAt(JwtAuthenticationFilter(tokenService), BasicAuthenticationFilter::class.java)
