@@ -38,7 +38,7 @@ class ControllerExceptionHandler(private val messageSource: MessageSource) {
     @ExceptionHandler(value = [MessageKeyException::class])
     fun handleTranslatedException(e: MessageKeyException): ResponseEntity<ErrorDto> {
         log.info("handleTranslateException", e)
-        return ResponseEntity.badRequest().body(ErrorDto(e.originClass, null, messageSource.getMessage(e.messageKey, e.args, Locale.getDefault())))
+        return ResponseEntity.badRequest().body(ErrorDto(e.originClass, null, messageSource.getMessage(e.messageKey, e.args, Locale("pl"))))
     }
 
     @ExceptionHandler(value = [MethodArgumentNotValidException::class])
