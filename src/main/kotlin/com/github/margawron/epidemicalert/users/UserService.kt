@@ -29,11 +29,7 @@ class UserService(
     }
 
     fun findAndCheckUserCredentials(loginDto: LoginDto): User {
-        val user: User = when {
-            loginDto.login != null -> userRepository.findByUserName(loginDto.login)
-            loginDto.email != null -> userRepository.findByUserEmail(loginDto.email)
-            else -> throw MessageKeyException(IllegalArgumentException::class, "user.credentials.identifier")
-        } ?: throw MessageKeyException(NoSuchElementException::class, "user.username.not_exists")
+        val user: User =  userRepository.findByUserName(loginDto.login) ?: throw MessageKeyException(NoSuchElementException::class, "user.username.not_exists")
 
         return if (passwordEncoder.matches(loginDto.password, user.passwordHash)) user else throw MessageKeyException(CredentialException::class, "user.credentials.notValid")
     }

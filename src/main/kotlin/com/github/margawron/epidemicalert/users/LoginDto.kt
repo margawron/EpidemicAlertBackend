@@ -5,8 +5,7 @@ import javax.validation.constraints.NotBlank
 
 @ApiModel(value="Login Request")
 class LoginDto(
-        val login: String?,
-        val email: String?,
+        val login: String,
 
         @NotBlank
         val password: String,

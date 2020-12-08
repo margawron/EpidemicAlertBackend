@@ -2,9 +2,5 @@ package com.github.margawron.epidemicalert.validation
 
 import io.swagger.annotations.ApiModel
 
-@ApiModel(value="Error Response")
-class ErrorDto(
-        val error: String?,
-        val `object`: String?,
-        val message: String?
-)
+@ApiModel(value = "Error Response")
+class ErrorDto(val errorName: String?, val errorField: String?, val errorMessage: String?)
