@@ -24,7 +24,6 @@ class AuthController(private val userService: UserService,
     @PostMapping(value = ["/auth/"])
     fun generateToken(@Valid @RequestBody loginRequest: LoginDto): TokenResponse {
         val user = userService.findAndCheckUserCredentials(loginRequest)
-        val token = tokenService.generateToken(user)
-        return TokenResponse(token)
+        return tokenService.generateToken(user)
     }
 }
