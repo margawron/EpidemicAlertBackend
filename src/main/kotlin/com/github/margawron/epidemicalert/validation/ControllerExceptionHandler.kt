@@ -1,6 +1,7 @@
 package com.github.margawron.epidemicalert.validation
 
-import com.github.margawron.epidemicalert.exceptions.MessageKeyException
+import com.github.margawron.epidemicalert.exceptions.KeyException
+import com.github.margawron.epidemicalert.exceptions.KeyWithFieldException
 import org.slf4j.LoggerFactory
 import org.springframework.context.MessageSource
 import org.springframework.http.HttpStatus
@@ -35,10 +36,16 @@ class ControllerExceptionHandler(private val messageSource: MessageSource) {
         return ResponseEntity.badRequest().body(ErrorDto(e.javaClass.simpleName, "body", "Invalid request"))
     }
 
-    @ExceptionHandler(value = [MessageKeyException::class])
-    fun handleTranslatedException(e: MessageKeyException): ResponseEntity<ErrorDto> {
+    @ExceptionHandler(value = [KeyException::class])
+    fun handleTranslatedException(e: KeyException): ResponseEntity<ErrorDto> {
         log.info("handleTranslateException", e)
         return ResponseEntity.badRequest().body(ErrorDto(e.originClass, null, messageSource.getMessage(e.messageKey, e.args, Locale("pl"))))
+    }
+
+    @ExceptionHandler(value = [KeyWithFieldException::class])
+    fun handleTranslatedExceptionWithField(e: KeyWithFieldException): ResponseEntity<ErrorDto> {
+        log.info("handleTranslateException", e)
+        return ResponseEntity.badRequest().body(ErrorDto(e.originClass, e.field, messageSource.getMessage(e.messageKey, e.args, Locale("pl"))))
     }
 
     @ExceptionHandler(value = [MethodArgumentNotValidException::class])
