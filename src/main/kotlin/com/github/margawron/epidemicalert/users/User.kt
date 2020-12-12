@@ -20,7 +20,7 @@ class User(
         @Column(name = "usr_username", nullable = false)
         var userName: String,
 
-        @Column(name = "usr_password", nullable = false)
+        @Column(name = "usr_password_hash", nullable = false)
         var passwordHash: String,
 
         @Column(name = "usr_mail", nullable = false)

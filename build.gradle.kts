@@ -6,6 +6,7 @@ plugins {
     kotlin("jvm") version "1.4.10"
     kotlin("plugin.spring") version "1.4.10"
     kotlin("plugin.jpa") version "1.4.10"
+    id("org.flywaydb.flyway") version "7.3.1"
 }
 
 group = "com.github.margawron"
@@ -23,6 +24,16 @@ repositories {
     maven(url = "http://oss.sonatype.org/content/repositories/snapshots")
 }
 
+flyway {
+    url = "${DB_HOST}"
+    user = "${DB_ROOT_USER}"
+    password = "${DB_ROOT_PASSWORD}"
+    schemas = arrayOf("public")
+    locations = arrayOf("filesystem:src/main/resources/db/migration")
+}
+
+
+
 dependencies {
     val jjwtVersion = "0.11.1"
 
@@ -30,6 +41,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-rest")
+    implementation("org.flywaydb:flyway-core:7.3.1")
+    implementation("org.flywaydb:flyway-core:7.3.1")
     runtimeOnly("org.postgresql:postgresql")
 
     implementation("io.springfox:springfox-boot-starter:3.0.0")
