@@ -39,13 +39,13 @@ class ControllerExceptionHandler(private val messageSource: MessageSource) {
     @ExceptionHandler(value = [KeyException::class])
     fun handleTranslatedException(e: KeyException): ResponseEntity<ErrorDto> {
         log.info("handleTranslateException", e)
-        return ResponseEntity.badRequest().body(ErrorDto(e.originClass, null, messageSource.getMessage(e.messageKey, e.args, Locale("pl"))))
+        return ResponseEntity.badRequest().body(ErrorDto(e.originClass, null, messageSource.getMessage(e.messageKey, e.args, Locale.getDefault())))
     }
 
     @ExceptionHandler(value = [KeyWithFieldException::class])
     fun handleTranslatedExceptionWithField(e: KeyWithFieldException): ResponseEntity<ErrorDto> {
         log.info("handleTranslateException", e)
-        return ResponseEntity.badRequest().body(ErrorDto(e.originClass, e.field, messageSource.getMessage(e.messageKey, e.args, Locale("pl"))))
+        return ResponseEntity.badRequest().body(ErrorDto(e.originClass, e.field, messageSource.getMessage(e.messageKey, e.args, Locale.getDefault())))
     }
 
     @ExceptionHandler(value = [MethodArgumentNotValidException::class])
