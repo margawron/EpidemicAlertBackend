@@ -4,7 +4,7 @@ import com.github.margawron.epidemicalert.converters.AccountStateConverter
 import com.github.margawron.epidemicalert.converters.RoleConverter
 import com.github.margawron.epidemicalert.device.Device
 import com.github.margawron.epidemicalert.location.LocationMeasurement
-import java.time.LocalDateTime
+import java.time.Instant
 import javax.persistence.*
 
 
@@ -31,10 +31,10 @@ class User(
         var role: Role = Role.USER,
 
         @Column(name = "usr_account_creation_date")
-        var accountCreationDate: LocalDateTime? = LocalDateTime.now(),
+        var accountCreationDate: Instant? = Instant.now(),
 
-        @Column(name = "usr_account_expiry_date", nullable = true)
-        var accountExpirationDate: LocalDateTime? = null,
+        @Column(name = "usr_account_expiry_date")
+        var accountExpirationDate: Instant? = null,
 
         @Convert(converter = AccountStateConverter::class)
         @Column(name = "usr_account_state", nullable = false)

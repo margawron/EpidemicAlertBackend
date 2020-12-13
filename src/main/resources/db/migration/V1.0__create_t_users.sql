@@ -4,8 +4,8 @@ create table t_users (
     usr_password_hash text,
     usr_mail text,
     usr_permission_group text,
-    usr_account_creation_date timestamp,
-    usr_account_expiry_date timestamp,
+    usr_account_creation_date timestamp with time zone,
+    usr_account_expiry_date timestamp with time zone,
     usr_account_state text
 );
 
