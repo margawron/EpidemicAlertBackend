@@ -1,5 +1,6 @@
 create table t_location_measurements(
     msr_id bigserial,
+    msr_timestamp timestamp with time zone,
     msr_latitude float,
     msr_longitude float,
     msr_accuracy float,

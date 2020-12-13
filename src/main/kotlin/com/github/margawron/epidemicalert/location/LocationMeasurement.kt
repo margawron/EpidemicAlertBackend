@@ -2,6 +2,7 @@ package com.github.margawron.epidemicalert.location
 
 import com.github.margawron.epidemicalert.device.Device
 import com.github.margawron.epidemicalert.users.User
+import java.time.Instant
 import javax.persistence.*
 
 @Entity
@@ -12,6 +13,9 @@ class LocationMeasurement(
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(name = "msr_id")
         val id: Long? = null,
+
+        @Column(name = "msr_timestamp")
+        var timestamp: Instant,
 
         @Column(name = "msr_latitude", nullable = false)
         var latitude: Float,
