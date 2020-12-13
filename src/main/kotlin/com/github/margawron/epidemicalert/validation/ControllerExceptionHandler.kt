@@ -25,27 +25,27 @@ class ControllerExceptionHandler(private val messageSource: MessageSource) {
     }
 
     @ExceptionHandler(value = [HttpRequestMethodNotSupportedException::class])
-    fun handleHttpMethodNotSupportedException(e: HttpRequestMethodNotSupportedException): ResponseEntity<ErrorDto> {
+    fun handleHttpMethodNotSupportedException(e: HttpRequestMethodNotSupportedException): ResponseEntity<List<ErrorDto>> {
         log.info("handleHttpMethodNotSupportedException", e)
-        return ResponseEntity.badRequest().body(ErrorDto(e.javaClass.simpleName, "http method", e.localizedMessage))
+        return ResponseEntity.badRequest().body(listOf(ErrorDto(e.javaClass.simpleName, "http method", e.localizedMessage)))
     }
 
     @ExceptionHandler(value = [HttpMessageNotReadableException::class])
-    fun handleHttpMessageNotReadableException(e: HttpMessageNotReadableException): ResponseEntity<ErrorDto> {
+    fun handleHttpMessageNotReadableException(e: HttpMessageNotReadableException): ResponseEntity<List<ErrorDto>> {
         log.info("handleHttpMessageNotReadableException", e)
-        return ResponseEntity.badRequest().body(ErrorDto(e.javaClass.simpleName, "body", "Invalid request"))
+        return ResponseEntity.badRequest().body(listOf(ErrorDto(e.javaClass.simpleName, "body", "Invalid request")))
     }
 
     @ExceptionHandler(value = [KeyException::class])
-    fun handleTranslatedException(e: KeyException): ResponseEntity<ErrorDto> {
+    fun handleTranslatedException(e: KeyException): ResponseEntity<List<ErrorDto>> {
         log.info("handleTranslateException", e)
-        return ResponseEntity.badRequest().body(ErrorDto(e.originClass, null, messageSource.getMessage(e.messageKey, e.args, Locale.getDefault())))
+        return ResponseEntity.badRequest().body(listOf(ErrorDto(e.originClass, null, messageSource.getMessage(e.messageKey, e.args, Locale.getDefault()))))
     }
 
     @ExceptionHandler(value = [KeyWithFieldException::class])
-    fun handleTranslatedExceptionWithField(e: KeyWithFieldException): ResponseEntity<ErrorDto> {
+    fun handleTranslatedExceptionWithField(e: KeyWithFieldException): ResponseEntity<List<ErrorDto>> {
         log.info("handleTranslateException", e)
-        return ResponseEntity.badRequest().body(ErrorDto(e.originClass, e.field, messageSource.getMessage(e.messageKey, e.args, Locale.getDefault())))
+        return ResponseEntity.badRequest().body(listOf(ErrorDto(e.originClass, e.field, messageSource.getMessage(e.messageKey, e.args, Locale.getDefault()))))
     }
 
     @ExceptionHandler(value = [MethodArgumentNotValidException::class])
@@ -70,19 +70,19 @@ class ControllerExceptionHandler(private val messageSource: MessageSource) {
     }
 
     @ExceptionHandler(value = [ValidationException::class])
-    fun handleValidationException(e: ValidationException): ResponseEntity<ErrorDto> {
+    fun handleValidationException(e: ValidationException): ResponseEntity<List<ErrorDto>> {
         log.info("handleValidationException", e)
-        return ResponseEntity.badRequest().body(ErrorDto(ValidationException::class.simpleName, null, e.message))
+        return ResponseEntity.badRequest().body(listOf(ErrorDto(ValidationException::class.simpleName, null, e.message)))
     }
     @ExceptionHandler(value = [NoSuchElementException::class])
-    fun handleNoSuchElementException(e: NoSuchElementException): ResponseEntity<ErrorDto> {
+    fun handleNoSuchElementException(e: NoSuchElementException): ResponseEntity<List<ErrorDto>> {
         log.info("handleNoSuchElementException", e)
-        return ResponseEntity(ErrorDto(NoSuchElementException::class.simpleName, null, e.message), HttpStatus.NOT_FOUND)
+        return ResponseEntity(listOf(ErrorDto(NoSuchElementException::class.simpleName, null, e.message)), HttpStatus.NOT_FOUND)
     }
 
     @ExceptionHandler(value = [CredentialException::class])
-    fun handleCredentialException(e: CredentialException): ResponseEntity<ErrorDto> {
+    fun handleCredentialException(e: CredentialException): ResponseEntity<List<ErrorDto>> {
         log.info("handleCredentialException", e)
-        return ResponseEntity.badRequest().body(ErrorDto(CredentialException::class.simpleName, null, e.message))
+        return ResponseEntity.badRequest().body(listOf(ErrorDto(CredentialException::class.simpleName, null, e.message)))
     }
 }
