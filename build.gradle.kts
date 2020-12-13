@@ -42,7 +42,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-rest")
     implementation("org.flywaydb:flyway-core:7.3.1")
-    implementation("org.flywaydb:flyway-core:7.3.1")
     runtimeOnly("org.postgresql:postgresql")
 
     implementation("io.springfox:springfox-boot-starter:3.0.0")
