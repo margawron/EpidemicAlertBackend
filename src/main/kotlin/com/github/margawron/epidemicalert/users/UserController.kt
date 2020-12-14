@@ -1,16 +1,20 @@
 package com.github.margawron.epidemicalert.users
 
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class UserController {
+class UserController(
+    private val userService: UserService
+) {
 
-    @GetMapping("/user")
+    @GetMapping("users/self")
     @PreAuthorize("@permissionEvaluator.isUser(authentication)")
-    fun test(): String {
-        return "hello user"
+    fun getSelfData(authentication: Authentication): ResponseEntity<UserDto> {
+        return ResponseEntity.ok(UserDto.fromEntity(authentication.principal as User))
     }
 
     @GetMapping("/moderator")
