@@ -18,10 +18,10 @@ class Measurement(
         var timestamp: Instant,
 
         @Column(name = "msr_latitude", nullable = false)
-        var latitude: Float,
+        var latitude: Double,
 
         @Column(name = "msr_longitude")
-        var longitude: Float,
+        var longitude: Double,
 
         @Column(name = "msr_accuracy")
         var accuracy: Float,
