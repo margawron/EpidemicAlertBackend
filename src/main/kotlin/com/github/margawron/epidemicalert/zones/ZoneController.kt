@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 
 
@@ -23,5 +24,12 @@ class ZoneController(
     @PreAuthorize("@permissionEvaluator.isUser(authentication)")
     fun getAllZones(): ResponseEntity<List<Zone>> {
         return ResponseEntity.ok().body(zoneService.findAllZones().toList())
+    }
+
+    @PostMapping(value = ["zones/modify"])
+    @PreAuthorize("@permissionEvaluator.isAdmin(authentication)")
+    fun modifyZone(zone: Zone): ResponseEntity<Any> {
+        zoneService.saveModifiedZone(zone)
+        return ResponseEntity.ok().build()
     }
 }

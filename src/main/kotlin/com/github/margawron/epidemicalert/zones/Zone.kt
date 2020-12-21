@@ -10,10 +10,10 @@ class Zone (
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "zne_id")
+    @Column(name = "zne_id", updatable = false)
     val id: Long? = null,
 
-    @Column(name = "zne_name")
+    @Column(name = "zne_name", updatable = false)
     val name: String,
 
     @Column(name = "zne_level")

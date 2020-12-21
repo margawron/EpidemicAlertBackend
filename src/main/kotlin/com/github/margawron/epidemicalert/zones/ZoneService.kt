@@ -9,4 +9,6 @@ class ZoneService(
     fun findZoneByName(name: String) = zoneRepository.findByName(name)
 
     fun findAllZones(): Iterable<Zone> = zoneRepository.findAll()
+
+    fun saveModifiedZone(zone: Zone) = zoneRepository.save(zone)
 }
