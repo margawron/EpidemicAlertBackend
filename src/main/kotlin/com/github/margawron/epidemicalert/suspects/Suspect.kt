@@ -1,5 +1,6 @@
 package com.github.margawron.epidemicalert.suspects
 
+import com.github.margawron.epidemicalert.alerts.Alert
 import com.github.margawron.epidemicalert.converters.SuspicionLevelConverter
 import com.github.margawron.epidemicalert.pathogens.Pathogen
 import com.github.margawron.epidemicalert.users.User
@@ -22,11 +23,14 @@ class Suspect (
     @Convert(converter = SuspicionLevelConverter::class)
     val suspicionLevel: SuspicionLevel,
 
-    @Column(name = "sus_usr_id")
+    @JoinColumn(name = "sus_usr_id")
     @ManyToOne(targetEntity = User::class)
     val suspect: User,
 
-    @Column(name = "sus_pat_id")
+    @JoinColumn(name = "sus_pat_id")
     @ManyToOne(targetEntity = Pathogen::class)
-    val pathogen: Pathogen
+    val pathogen: Pathogen,
+
+    @OneToMany(mappedBy = "suspect")
+    val alerts: List<Alert>
 )
