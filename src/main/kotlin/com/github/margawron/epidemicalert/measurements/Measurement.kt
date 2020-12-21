@@ -1,4 +1,4 @@
-package com.github.margawron.epidemicalert.location
+package com.github.margawron.epidemicalert.measurements
 
 import com.github.margawron.epidemicalert.device.Device
 import com.github.margawron.epidemicalert.users.User
@@ -7,7 +7,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "t_location_measurements")
-class LocationMeasurement(
+class Measurement(
 
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)

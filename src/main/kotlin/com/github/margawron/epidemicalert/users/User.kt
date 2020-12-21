@@ -3,7 +3,7 @@ package com.github.margawron.epidemicalert.users
 import com.github.margawron.epidemicalert.converters.AccountStateConverter
 import com.github.margawron.epidemicalert.converters.RoleConverter
 import com.github.margawron.epidemicalert.device.Device
-import com.github.margawron.epidemicalert.location.LocationMeasurement
+import com.github.margawron.epidemicalert.measurements.Measurement
 import java.security.Principal
 import java.time.Instant
 import javax.persistence.*
@@ -45,7 +45,7 @@ class User(
     var userDevices: Set<Device> = mutableSetOf(),
 
     @OneToMany(mappedBy = "ownerOfMeasurement")
-    var userLocationMeasurementHistory: Set<LocationMeasurement> = mutableSetOf()
+    var userMeasurementHistory: Set<Measurement> = mutableSetOf()
 
 ) : Principal {
     override fun getName() = userName

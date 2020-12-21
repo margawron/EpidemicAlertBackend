@@ -1,6 +1,6 @@
 package com.github.margawron.epidemicalert.device
 
-import com.github.margawron.epidemicalert.location.LocationMeasurement
+import com.github.margawron.epidemicalert.measurements.Measurement
 import com.github.margawron.epidemicalert.users.User
 import javax.persistence.*
 
@@ -27,5 +27,5 @@ class Device(
         var deviceOwner: User,
 
         @OneToMany(mappedBy = "originOfMeasurement")
-        var devices: Set<LocationMeasurement> = emptySet()
+        var devices: Set<Measurement> = emptySet()
 )
