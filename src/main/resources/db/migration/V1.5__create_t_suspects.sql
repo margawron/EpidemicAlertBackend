@@ -10,7 +10,7 @@ alter table t_suspects add constraint pk_t_suspects_sus_id
     primary key (sus_id);
 
 alter table t_suspects add constraint fk_t_suspects_sus_usr_id
-foreign key (sus_usr_id) references t_users(usr_id);
+    foreign key (sus_usr_id) references t_users(usr_id);
 
 alter table t_suspects add constraint fk_t_suspects_sus_pat_id
     foreign key (sus_pat_id) references t_pathogens(pat_id);
