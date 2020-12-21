@@ -6,3 +6,6 @@ create table t_pathogens(
         pat_detection_range float,
         pat_accuracy float
 );
+
+alter table t_pathogens add constraint pk_t_pathogens_pat_id
+    primary key (pat_id);

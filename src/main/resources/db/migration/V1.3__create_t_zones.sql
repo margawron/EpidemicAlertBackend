@@ -387,3 +387,6 @@ values ('powiat aleksandrowski', 'Y', now()),
        ('powiat żuromiński', 'Y', now()),
        ('powiat żyrardowski', 'Y', now()),
        ('powiat żywiecki', 'Y', now());
+
+alter table t_zones add constraint pk_t_zones_zne_id
+    primary key (zne_id)
