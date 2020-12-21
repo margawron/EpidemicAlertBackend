@@ -17,6 +17,10 @@ epidemicalert:
   token:
     expiryTime: 28800 # 8 hours
 
+app:
+  firebase-configuration-file:
+    firebase-sdk-config.json
+
 ---
 
 spring:
