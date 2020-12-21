@@ -54,8 +54,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
-    implementation("net.sourceforge.htmlunit:htmlunit:2.45.0")
-    implementation("org.jsoup:jsoup:1.13.1")
+    
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
