@@ -18,3 +18,6 @@ foreign key (msr_usr_id) references t_users(usr_id);
 
 alter table t_location_measurements add constraint fk_t_location_measurements_msr_dev_id
 foreign key (msr_dev_id) references t_devices(dev_id);
+
+create index idx_t_location_measurements_geoposition on t_location_measurements(msr_latitude, msr_longitude);
+create index idx_t_location_measurements_time on t_location_measurements(msr_timestamp);
