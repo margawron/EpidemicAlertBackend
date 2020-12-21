@@ -11,7 +11,7 @@ enum class Role(private val mapping: String) : GrantedAuthority {
     override fun getAuthority(): String = mapping
 
     companion object {
-        fun fromRole(mapping: String): Role =
+        fun fromDatabaseMapping(mapping: String): Role =
                 values().find { it.mapping == mapping }
                         ?: throw KeyException(IllegalStateException::class, "internal.role.cannot_map", arrayOf(mapping))
     }

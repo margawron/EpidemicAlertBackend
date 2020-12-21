@@ -7,6 +7,6 @@ class RoleConverter : AttributeConverter<Role, String> {
 
     override fun convertToDatabaseColumn(attribute: Role): String = attribute.authority
 
-    override fun convertToEntityAttribute(dbData: String): Role = Role.fromRole(dbData)
+    override fun convertToEntityAttribute(columnData: String): Role = Role.fromDatabaseMapping(columnData)
 
 }
