@@ -8,9 +8,17 @@ import javax.validation.constraints.Size
 class LoginDto(
         @field:NotBlank(message = "{login.required}")
         @field:Size(min = 5, max = 12, message = "{login.requirements}")
-        var login: String,
+        val login: String,
 
         @field:NotBlank(message = "{password.required}")
         @field:Size(min = 5, max = 32, message = "{password.requirements}")
-        var password: String,
+        val password: String,
+
+        val fcmToken: String,
+
+        val manufacturer: String?,
+
+        val deviceName: String?,
+
+        val serialNumber: String?,
 )
