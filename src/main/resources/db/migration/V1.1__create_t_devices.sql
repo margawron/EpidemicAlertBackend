@@ -1,6 +1,7 @@
 create table t_devices (
     dev_id bigserial,
     dev_manufacturer text,
+    dev_firebase_token text,
     dev_name text,
     dev_serial_number text,
     dev_usr_id bigint

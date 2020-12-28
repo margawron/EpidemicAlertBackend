@@ -16,6 +16,9 @@ class Device(
         @Column(name = "dev_manufacturer", nullable = false)
         var manufacturer: String,
 
+        @Column(name = "dev_firebase_token")
+        var firebaseToken: String,
+
         @Column(name = "dev_name", nullable = false)
         var deviceName: String,
 
