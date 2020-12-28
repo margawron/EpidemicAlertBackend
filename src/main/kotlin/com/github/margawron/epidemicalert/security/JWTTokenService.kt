@@ -1,5 +1,6 @@
 package com.github.margawron.epidemicalert.security
 
+import com.github.margawron.epidemicalert.device.Device
 import com.github.margawron.epidemicalert.users.User
 import com.github.margawron.epidemicalert.users.UserService
 import io.jsonwebtoken.ExpiredJwtException
@@ -28,7 +29,7 @@ class JWTTokenService(
 
     private val JWT_SECRET_BYTES = secret.toByteArray()
 
-    fun generateToken(user: User): TokenResponse {
+    fun generateToken(user: User, device: Device): LoginResponse {
         val expirationDate = Date.from(Instant.now().plus(expirySeconds, ChronoUnit.SECONDS))
         val key = Keys.hmacShaKeyFor(JWT_SECRET_BYTES)
 
@@ -39,7 +40,7 @@ class JWTTokenService(
             .setExpiration(expirationDate)
             .signWith(key, SignatureAlgorithm.HS512)
             .compact()
-        return TokenResponse("Bearer $token", expirationDate)
+        return LoginResponse("Bearer $token", expirationDate, device.id!!)
     }
 
     fun parseToken(token: String): User {

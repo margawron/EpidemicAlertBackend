@@ -16,9 +16,10 @@ class LoginDto(
 
         val fcmToken: String,
 
-        val manufacturer: String?,
+        val serialNumber: String,
 
-        val deviceName: String?,
+        val manufacturer: String,
 
-        val serialNumber: String?,
+        val deviceName: String,
+
 )

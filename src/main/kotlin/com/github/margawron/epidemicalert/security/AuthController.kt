@@ -1,5 +1,6 @@
 package com.github.margawron.epidemicalert.security
 
+import com.github.margawron.epidemicalert.device.DeviceService
 import com.github.margawron.epidemicalert.users.LoginDto
 import com.github.margawron.epidemicalert.users.RegistrationDto
 import com.github.margawron.epidemicalert.users.UserDto
@@ -12,6 +13,7 @@ import javax.validation.Valid
 
 @RestController
 class AuthController(private val userService: UserService,
+                     private val deviceService: DeviceService,
                      private val tokenService: JWTTokenService) {
 
     @PostMapping(value = ["/register/"])
@@ -22,8 +24,9 @@ class AuthController(private val userService: UserService,
     }
 
     @PostMapping(value = ["/auth/"])
-    fun generateToken(@Valid @RequestBody loginRequest: LoginDto): TokenResponse {
+    fun generateToken(@Valid @RequestBody loginRequest: LoginDto): LoginResponse {
         val user = userService.findAndCheckUserCredentials(loginRequest)
-        return tokenService.generateToken(user)
+        val device = deviceService.registerDeviceOrUpdateFirebaseToken(user, loginRequest)
+        return tokenService.generateToken(user, device)
     }
 }

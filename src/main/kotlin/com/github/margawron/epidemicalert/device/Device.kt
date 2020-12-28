@@ -30,5 +30,5 @@ class Device(
         var deviceOwner: User,
 
         @OneToMany(mappedBy = "originOfMeasurement")
-        var devices: Set<Measurement> = emptySet()
+        var deviceMeasurements: Set<Measurement> = emptySet()
 )
