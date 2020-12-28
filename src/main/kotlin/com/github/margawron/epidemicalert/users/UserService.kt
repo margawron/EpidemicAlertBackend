@@ -2,6 +2,7 @@ package com.github.margawron.epidemicalert.users
 
 import com.github.margawron.epidemicalert.exceptions.KeyException
 import com.github.margawron.epidemicalert.exceptions.KeyWithFieldException
+import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -40,4 +41,7 @@ class UserService(
         return userRepository.findByUserName(username)
                 ?: throw KeyException(UsernameNotFoundException::class, "user.username.not_exists", arrayOf(username))
     }
+
+    fun userFromAuth(auth: Authentication): User = auth.principal as User
+
 }

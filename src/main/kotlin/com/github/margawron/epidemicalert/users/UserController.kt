@@ -14,7 +14,8 @@ class UserController(
     @GetMapping("users/self")
     @PreAuthorize("@permissionEvaluator.isUser(authentication)")
     fun getSelfData(authentication: Authentication): ResponseEntity<UserDto> {
-        val userDto = UserDto.fromEntity(authentication.principal as User)
+        val user = userService.userFromAuth(authentication)
+        val userDto = UserDto.fromEntity(user)
         return ResponseEntity.ok(userDto)
     }
 
