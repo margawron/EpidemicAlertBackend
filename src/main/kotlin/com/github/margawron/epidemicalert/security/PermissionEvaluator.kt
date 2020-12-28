@@ -17,5 +17,6 @@ class PermissionEvaluator {
 
     fun isAdmin(auth: Authentication): Boolean = auth.authorities.contains(Role.ADMINISTRATOR)
 
-
+    @Deprecated(message = "Debug only.", replaceWith = ReplaceWith("false"))
+    fun any(): Boolean = true
 }
