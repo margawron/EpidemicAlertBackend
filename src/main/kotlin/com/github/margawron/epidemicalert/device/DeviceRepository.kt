@@ -1,5 +1,7 @@
 package com.github.margawron.epidemicalert.device
 
-import org.springframework.data.repository.PagingAndSortingRepository
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.stereotype.Repository
 
-interface DeviceRepository : PagingAndSortingRepository<Device, Long>
+@Repository
+interface DeviceRepository : JpaRepository<Device, Long>
