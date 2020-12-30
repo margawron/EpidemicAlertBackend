@@ -1,5 +1,6 @@
 package com.github.margawron.epidemicalert.security
 
+import com.github.margawron.epidemicalert.users.UserPrincipal
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.filter.OncePerRequestFilter
@@ -29,7 +30,8 @@ class JwtAuthenticationFilter(private val tokenService: JWTTokenService) : OnceP
         val token = authHeader.replace("Bearer ", "")
         val user = tokenService.parseToken(token)
 
-        return UsernamePasswordAuthenticationToken(user, null, setOf(user.role))
+        val userPrincipal = UserPrincipal.fromUser(user)
+        return UsernamePasswordAuthenticationToken(userPrincipal, null, setOf(user.role))
     }
 
 }

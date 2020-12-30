@@ -46,7 +46,4 @@ class User(
 
     @OneToMany(mappedBy = "ownerOfMeasurement")
     var userMeasurementHistory: Set<Measurement> = mutableSetOf()
-
-) : Principal {
-    override fun getName() = userName
-}
+)

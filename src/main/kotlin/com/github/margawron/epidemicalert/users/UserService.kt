@@ -42,6 +42,9 @@ class UserService(
                 ?: throw KeyException(UsernameNotFoundException::class, "user.username.not_exists", arrayOf(username))
     }
 
-    fun userFromAuth(auth: Authentication): User = auth.principal as User
+    fun userFromAuth(auth: Authentication): User {
+        val userPrincipal = auth.principal as UserPrincipal
+        return userRepository.getOne(userPrincipal.id)
+    }
 
 }
