@@ -1,5 +1,6 @@
 package com.github.margawron.epidemicalert.users
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.margawron.epidemicalert.converters.AccountStateConverter
 import com.github.margawron.epidemicalert.converters.RoleConverter
 import com.github.margawron.epidemicalert.device.Device
@@ -16,6 +17,7 @@ class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "usr_id")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     val id: Long? = null,
 
     @Column(name = "usr_username", nullable = false)

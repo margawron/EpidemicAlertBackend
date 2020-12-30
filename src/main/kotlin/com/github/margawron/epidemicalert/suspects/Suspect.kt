@@ -1,5 +1,6 @@
 package com.github.margawron.epidemicalert.suspects
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.margawron.epidemicalert.alerts.Alert
 import com.github.margawron.epidemicalert.converters.SuspicionLevelConverter
 import com.github.margawron.epidemicalert.pathogens.Pathogen
@@ -14,6 +15,7 @@ class Suspect (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sus_id")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     val id: Long?,
 
     @Column(name = "sus_start_time")

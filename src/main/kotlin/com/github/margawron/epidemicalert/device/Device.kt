@@ -1,5 +1,6 @@
 package com.github.margawron.epidemicalert.device
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.margawron.epidemicalert.measurements.Measurement
 import com.github.margawron.epidemicalert.users.User
 import javax.persistence.*
@@ -8,27 +9,28 @@ import javax.persistence.*
 @Table(name = "t_devices")
 class Device(
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(name = "dev_id", nullable = false)
-        val id: Long? = null,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "dev_id", nullable = false)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    val id: Long? = null,
 
-        @Column(name = "dev_manufacturer", nullable = false)
-        var manufacturer: String,
+    @Column(name = "dev_manufacturer", nullable = false)
+    var manufacturer: String,
 
-        @Column(name = "dev_firebase_token")
-        var firebaseToken: String,
+    @Column(name = "dev_firebase_token")
+    var firebaseToken: String,
 
-        @Column(name = "dev_name", nullable = false)
-        var deviceName: String,
+    @Column(name = "dev_name", nullable = false)
+    var deviceName: String,
 
-        @Column(name = "dev_serial_number", nullable = false)
-        var serialNumber: String,
+    @Column(name = "dev_serial_number", nullable = false)
+    var serialNumber: String,
 
-        @ManyToOne
-        @JoinColumn(name = "dev_usr_id")
-        var deviceOwner: User,
+    @ManyToOne
+    @JoinColumn(name = "dev_usr_id")
+    var deviceOwner: User,
 
-        @OneToMany(mappedBy = "originOfMeasurement")
-        var deviceMeasurements: Set<Measurement> = emptySet()
+    @OneToMany(mappedBy = "originOfMeasurement")
+    var deviceMeasurements: Set<Measurement> = emptySet()
 )

@@ -1,5 +1,6 @@
 package com.github.margawron.epidemicalert.location
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.margawron.epidemicalert.converters.LocationTypeConverter
 import java.time.Instant
 import javax.persistence.*
@@ -11,6 +12,7 @@ class Location(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "loc_id")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     val id: Long?,
 
     @Column(name = "loc_expiry_date")

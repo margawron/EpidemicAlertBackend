@@ -1,5 +1,6 @@
 package com.github.margawron.epidemicalert.proximity
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.margawron.epidemicalert.alerts.Alert
 import com.github.margawron.epidemicalert.converters.ProximityTypeConverter
 import com.github.margawron.epidemicalert.measurements.Measurement
@@ -12,6 +13,7 @@ class ProximityMeasurement(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "prx_id")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     val id: Long?,
 
     @JoinColumn(name = "prx_msr_id")
