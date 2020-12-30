@@ -2,9 +2,9 @@ package com.github.margawron.epidemicalert.exceptions
 
 import kotlin.reflect.KClass
 
-class KeyWithFieldException(
+class ErrorCodeWithFieldException(
     originClass: KClass<*>,
     messageKey: String,
     args: Array<String>? = null,
     val field: String
-) : KeyException(originClass, messageKey, args)
+) : ErrorCodeException(originClass, messageKey, args)

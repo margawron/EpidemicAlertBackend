@@ -1,7 +1,7 @@
 package com.github.margawron.epidemicalert.validation
 
-import com.github.margawron.epidemicalert.exceptions.KeyException
-import com.github.margawron.epidemicalert.exceptions.KeyWithFieldException
+import com.github.margawron.epidemicalert.exceptions.ErrorCodeException
+import com.github.margawron.epidemicalert.exceptions.ErrorCodeWithFieldException
 import org.slf4j.LoggerFactory
 import org.springframework.context.MessageSource
 import org.springframework.http.HttpStatus
@@ -36,14 +36,14 @@ class ControllerExceptionHandler(private val messageSource: MessageSource) {
         return ResponseEntity.badRequest().body(listOf(ErrorDto(e.javaClass.simpleName, "body", "Invalid request")))
     }
 
-    @ExceptionHandler(value = [KeyException::class])
-    fun handleTranslatedException(e: KeyException): ResponseEntity<List<ErrorDto>> {
+    @ExceptionHandler(value = [ErrorCodeException::class])
+    fun handleTranslatedException(e: ErrorCodeException): ResponseEntity<List<ErrorDto>> {
         log.info("handleTranslateException", e)
         return ResponseEntity.badRequest().body(listOf(ErrorDto(e.originClass, null, messageSource.getMessage(e.messageKey, e.args, Locale.getDefault()))))
     }
 
-    @ExceptionHandler(value = [KeyWithFieldException::class])
-    fun handleTranslatedExceptionWithField(e: KeyWithFieldException): ResponseEntity<List<ErrorDto>> {
+    @ExceptionHandler(value = [ErrorCodeWithFieldException::class])
+    fun handleTranslatedExceptionWithField(e: ErrorCodeWithFieldException): ResponseEntity<List<ErrorDto>> {
         log.info("handleTranslateException", e)
         return ResponseEntity.badRequest().body(listOf(ErrorDto(e.originClass, e.field, messageSource.getMessage(e.messageKey, e.args, Locale.getDefault()))))
     }
