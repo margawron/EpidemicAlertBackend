@@ -1,5 +1,6 @@
 package com.github.margawron.epidemicalert.pathogens
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.margawron.epidemicalert.converters.ContagiousPeriodResolutionConverter
 import javax.persistence.*
 
@@ -11,6 +12,7 @@ class Pathogen (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pat_id")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     val id: Long?,
 
     @Column(name = "pat_name")
