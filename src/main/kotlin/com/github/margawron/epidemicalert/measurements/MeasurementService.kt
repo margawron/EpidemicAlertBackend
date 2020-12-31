@@ -20,7 +20,7 @@ class MeasurementService(
 
         val device = user.userDevices.find { it.id!! == deviceId } ?: throw ErrorCodeException(
             this::class,
-            "device.device_with_id_not_exists"
+            "device.given_id_does_not_exist"
         )
         return measurementsDto.map{
             val measurement = Measurement(
