@@ -47,4 +47,6 @@ class UserService(
         return userRepository.getOne(userPrincipal.id)
     }
 
+    fun getUserById(userId: Long): User = userRepository.findById(userId).orElse(null) ?: throw ErrorCodeException(this::class, "user.given_id_does_not_exist")
+
 }
