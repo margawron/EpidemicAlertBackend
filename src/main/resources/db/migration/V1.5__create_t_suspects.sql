@@ -1,6 +1,6 @@
 create table t_suspects (
         sus_id bigserial,
-        sus_start_date timestamp with time zone,
+        sus_start_time timestamp with time zone,
         sus_suspiciousness text,
         sus_usr_id int,
         sus_pat_id int
