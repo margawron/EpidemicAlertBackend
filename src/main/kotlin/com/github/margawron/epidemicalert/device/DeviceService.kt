@@ -27,5 +27,10 @@ class DeviceService(
             deviceRepository.save(device)
         }
     }
+
+    @Transactional
+    fun saveDevice(device:Device): Device {
+        return deviceRepository.save(device)
+    }
     
 }
