@@ -11,4 +11,6 @@ class ZoneService(
     fun findAllZones(): Iterable<Zone> = zoneRepository.findAll()
 
     fun saveModifiedZone(zone: Zone) = zoneRepository.save(zone)
+
+    fun saveModifiedZones(zones: List<Zone>): List<Zone> = zoneRepository.saveAll(zones)
 }
