@@ -15,22 +15,9 @@ class UserController(
 
     @GetMapping("users/self")
     @PreAuthorize("@permissionEvaluator.isUser(authentication)")
-    fun getSelfData(authentication: Authentication): ResponseEntity<UserDto> {
+    fun getSelfData(authentication: Authentication): UserDto {
         val user = userService.userFromAuth(authentication)
-        val userDto = UserDto.fromEntity(user)
-        return ResponseEntity.ok(userDto)
-    }
-
-    @GetMapping("/moderator")
-    @PreAuthorize("@permissionEvaluator.isModerator(authentication)")
-    fun moderator():String{
-        return "hello moderator"
-    }
-
-    @GetMapping("/admin")
-    @PreAuthorize("@permissionEvaluator.isAdmin(authentication)")
-    fun admin():String{
-        return "hello administrator"
+        return UserDto.fromEntity(user)
     }
 
     @GetMapping("/test")

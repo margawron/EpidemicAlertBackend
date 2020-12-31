@@ -12,6 +12,14 @@ class UserDto(
     var accountState: AccountState
 ) {
     companion object {
-        fun fromEntity(user: User) = UserDto(user.id, user.userName, user.userEmail, user.role, user.accountCreationDate, user.accountExpirationDate, user.accountState)
+        fun fromEntity(user: User) = UserDto(
+            user.id,
+            user.userName,
+            user.userEmail,
+            user.role,
+            user.accountCreationDate,
+            user.accountExpirationDate,
+            user.accountState
+        )
     }
 }
