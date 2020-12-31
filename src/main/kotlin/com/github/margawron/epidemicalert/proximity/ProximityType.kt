@@ -9,7 +9,7 @@ enum class ProximityType(val mapping: String) {
     companion object {
         fun fromDatabaseMapping(mapping: String) =
             values().find { it.mapping == mapping }
-                ?: throw ErrorCodeException(IllegalStateException::class, "internal.state.cannot_map", arrayOf(mapping))
+                ?: throw ErrorCodeException(IllegalStateException::class, "internal.proximity_type.cannot_map", arrayOf(mapping))
     }
 
 }

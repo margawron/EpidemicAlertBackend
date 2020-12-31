@@ -9,6 +9,6 @@ enum class LocationType(val mapping: String) {
     companion object {
         fun fromDatabaseMapping(mapping: String) =
             LocationType.values().find { it.mapping == mapping }
-                ?: throw ErrorCodeException(IllegalStateException::class, "internal.state.cannot_map", arrayOf(mapping))
+                ?: throw ErrorCodeException(IllegalStateException::class, "internal.location_type.cannot_map", arrayOf(mapping))
     }
 }

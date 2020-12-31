@@ -10,6 +10,6 @@ enum class ZoneEmergencyLevel(val mapping: String) {
     companion object {
         fun fromDatabaseMapping(mapping: String) =
             values().find { it.mapping == mapping }
-                ?: throw ErrorCodeException(IllegalStateException::class, "internal.state.cannot_map", arrayOf(mapping))
+                ?: throw ErrorCodeException(IllegalStateException::class, "internal.zone_emergency_level.cannot_map", arrayOf(mapping))
     }
 }
