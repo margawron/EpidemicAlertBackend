@@ -10,7 +10,7 @@ class PathogenService(
 
     fun getPathogenContainingStringInName(string: String): List<Pathogen> = pathogenRepository.findByNameContainingIgnoreCase(string)
 
-    fun getPathogenById(pathogenId: Long): Pathogen? = pathogenRepository.findById(pathogenId).orElse(null)
+    fun getPathogenById(pathogenId: Long): Pathogen = pathogenRepository.findById(pathogenId).orElse(null) ?: throw ErrorCodeException(this::class, "pathogen.given_id_does_not_exist")
 
     fun getAllPathogens(): List<Pathogen> = pathogenRepository.findAll()
 

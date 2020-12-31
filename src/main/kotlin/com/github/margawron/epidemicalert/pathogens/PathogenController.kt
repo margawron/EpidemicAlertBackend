@@ -13,7 +13,7 @@ class PathogenController(
     @GetMapping("pathogen/id/{pathogenId}")
     @PreAuthorize("@permissionEvaluator.isRegistered(authentication)")
     fun getPathogen(@PathVariable("pathogenId") pathogenId: Long): ResponseEntity<Pathogen> {
-        val pathogen = pathogenService.getPathogenById(pathogenId) ?: throw ErrorCodeException(this::class, "pathogen.given_id_does_not_exist")
+        val pathogen = pathogenService.getPathogenById(pathogenId)
         return ResponseEntity.ok(pathogen)
     }
 
