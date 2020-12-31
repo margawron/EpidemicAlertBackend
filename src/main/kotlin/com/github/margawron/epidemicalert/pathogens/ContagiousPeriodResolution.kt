@@ -1,11 +1,12 @@
 package com.github.margawron.epidemicalert.pathogens
 
 import com.github.margawron.epidemicalert.exceptions.ErrorCodeException
+import java.time.temporal.ChronoUnit
 
-enum class ContagiousPeriodResolution(val mapping: String) {
-    MINUTES("M"),
-    HOURS("H"),
-    DAYS("D");
+enum class ContagiousPeriodResolution(val mapping: String, val chronoUnit: ChronoUnit) {
+    MINUTES("M", ChronoUnit.MINUTES),
+    HOURS("H", ChronoUnit.HOURS),
+    DAYS("D", ChronoUnit.DAYS);
 
     companion object {
         fun fromDatabaseMapping(mapping: String) =
