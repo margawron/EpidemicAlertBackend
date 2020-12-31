@@ -10,4 +10,6 @@ interface UserRepository : JpaRepository<User, Long> {
 
     fun findByUserEmail(mail: String): User?
 
+    fun findAllByUserNameContainingIgnoreCase(string: String): List<User>
+
 }
