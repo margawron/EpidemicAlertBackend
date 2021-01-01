@@ -33,4 +33,18 @@ class LocationService(
         return locationRepository.findAllByLatitudeLessThanEqualAndLatitudeGreaterThanEqualAndLongitudeLessThanEqualAndLongitudeGreaterThanEqual(maxLat, minLat, maxLng, minLng)
     }
 
+    fun createAndSaveLocationFromDto(dto: LocationDto): Location{
+        val location = Location(
+            null,
+            dto.expiryDate,
+            dto.latitude,
+            dto.longitude,
+            dto.locationType,
+            dto.description
+        )
+        return locationRepository.save(location)
+    }
+
+    fun deleteById(id: Long): Unit = locationRepository.deleteById(id)
+
 }
