@@ -1,6 +1,5 @@
 package com.github.margawron.epidemicalert.zones
 
-import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -15,26 +14,30 @@ class ZoneController(
 
     @GetMapping(value = ["zone/{name}"])
     @PreAuthorize("@permissionEvaluator.isRegistered(authentication)")
-    fun getZoneByName(@PathVariable name: String): ResponseEntity<Zone> {
+    fun getZoneByName(@PathVariable name: String): ZoneDto {
         val zone = zoneService.findZoneByName(name)
-        return if (zone != null) ResponseEntity.ok(zone) else ResponseEntity.notFound().build()
+        return ZoneDto.fromZone(zone)
     }
 
     @GetMapping(value = ["zone/"])
     @PreAuthorize("@permissionEvaluator.isRegistered(authentication)")
-    fun getAllZones(): List<Zone> {
-        return zoneService.findAllZones().toList()
+    fun getAllZones(): List<ZoneDto> {
+        val zones = zoneService.findAllZones().toList()
+        return zones.map { ZoneDto.fromZone(it) }
     }
 
     @PostMapping(value = ["zone/modify"])
     @PreAuthorize("@permissionEvaluator.isAdmin(authentication)")
-    fun modifyZone(zone: Zone): Zone {
-        return zoneService.saveModifiedZone(zone)
+    fun modifyZone(zone: Zone): ZoneDto {
+        val savedZone = zoneService.saveModifiedZone(zone)
+        return ZoneDto.fromZone(savedZone)
     }
 
     @PostMapping(value = ["zones/modify"])
     @PreAuthorize("@permissionEvaluator.isAdmin(authentication)")
-    fun modifyMultipleZones(zones: List<Zone>): List<Zone> {
-        return zoneService.saveModifiedZones(zones)
+    fun modifyMultipleZones(zones: List<ZoneDto>): List<ZoneDto> {
+        val incomingZones = zones.map { Zone.fromDto(it) }
+        val savedZones = zoneService.saveModifiedZones(incomingZones)
+        return savedZones.map{ ZoneDto.fromZone(it) }
     }
 }

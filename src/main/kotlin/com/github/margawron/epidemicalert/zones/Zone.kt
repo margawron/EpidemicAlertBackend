@@ -22,4 +22,13 @@ class Zone (
 
     @Column(name = "zne_modification_date")
     val activeSince: Instant
-)
+){
+    companion object{
+        fun fromDto(dto: ZoneDto) = Zone(
+            dto.id,
+            dto.name,
+            dto.zoneEmergencyLevel,
+            dto.activeSince
+        )
+    }
+}
