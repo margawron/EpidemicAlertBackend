@@ -7,9 +7,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
 import javax.security.auth.login.CredentialException
 import javax.validation.ValidationException
+import kotlin.NoSuchElementException
 
 @Service
 class UserService(
@@ -60,6 +60,11 @@ class UserService(
             "password"
         )
     }
+
+    fun findUserById(id: Long) = userRepository.findById(id).orElse(null) ?: throw ErrorCodeException(User::class, "user.given_id_does_not_exist")
+
+    @Transactional
+    fun saveUser(user: User): User = userRepository.save(user)
 
     fun findUserByUsername(username: String?): User {
         if (username == null) throw ErrorCodeException(IllegalArgumentException::class, "user.username.not_null")
