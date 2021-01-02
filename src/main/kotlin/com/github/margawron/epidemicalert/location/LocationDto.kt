@@ -1,10 +1,8 @@
 package com.github.margawron.epidemicalert.location
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.Instant
 
 data class LocationDto (
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     var id: Long? = null,
     var expiryDate: Instant,
     var latitude: Double,

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.Instant
 
 data class ZoneDto(
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     var id: Long? = null,
     val name: String,
     val zoneEmergencyLevel: ZoneEmergencyLevel,
