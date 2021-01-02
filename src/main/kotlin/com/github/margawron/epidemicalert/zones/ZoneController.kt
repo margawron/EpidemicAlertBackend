@@ -28,8 +28,9 @@ class ZoneController(
 
     @PostMapping(value = ["zone/modify"])
     @PreAuthorize("@permissionEvaluator.isAdmin(authentication)")
-    fun modifyZone(zone: Zone): ZoneDto {
-        val savedZone = zoneService.saveModifiedZone(zone)
+    fun modifyZone(zone: ZoneDto): ZoneDto {
+        val incomingZone = Zone.fromDto(zone)
+        val savedZone = zoneService.saveModifiedZone(incomingZone)
         return ZoneDto.fromZone(savedZone)
     }
 
