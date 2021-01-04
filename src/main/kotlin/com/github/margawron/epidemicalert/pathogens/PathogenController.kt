@@ -1,7 +1,5 @@
 package com.github.margawron.epidemicalert.pathogens
 
-import com.github.margawron.epidemicalert.exceptions.ErrorCodeException
-import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
@@ -12,29 +10,28 @@ class PathogenController(
 
     @GetMapping("pathogen/id/{pathogenId}")
     @PreAuthorize("@permissionEvaluator.isRegistered(authentication)")
-    fun getPathogen(@PathVariable("pathogenId") pathogenId: Long): ResponseEntity<Pathogen> {
+    fun getPathogen(@PathVariable("pathogenId") pathogenId: Long): PathogenDto {
         val pathogen = pathogenService.getPathogenById(pathogenId)
-        return ResponseEntity.ok(pathogen)
+        return PathogenDto.fromEntity(pathogen)
     }
 
     @GetMapping("pathogen/all")
     @PreAuthorize("@permissionEvaluator.isAtLeastModerator(authentication)")
-    fun getAllPathogens(): ResponseEntity<List<Pathogen>> {
+    fun getAllPathogens(): List<PathogenDto> {
         val pathogens = pathogenService.getAllPathogens()
-        return ResponseEntity.ok(pathogens)
+        return pathogens.map { PathogenDto.fromEntity(it) }
     }
 
     @GetMapping("pathogen/name/{name}")
     @PreAuthorize("@permissionEvaluator.isAtLeastModerator(authentication)")
-    fun findPathogensContainingStringInName(@PathVariable("name") string: String): ResponseEntity<List<Pathogen>>{
+    fun findPathogensContainingStringInName(@PathVariable("name") string: String): List<PathogenDto>{
         val pathogens = pathogenService.getPathogenContainingStringInName(string)
-        return ResponseEntity.ok(pathogens)
+        return pathogens.map { PathogenDto.fromEntity(it) }
     }
 
     @PostMapping("pathogen")
     @PreAuthorize("@permissionEvaluator.isAdmin(authentication)")
-    fun createPathogen(@RequestBody pathogen: Pathogen): ResponseEntity<Pathogen>{
-        val createdPathogen = pathogenService.createPathogenWithGivenName(pathogen)
-        return ResponseEntity.ok(createdPathogen)
+    fun createPathogen(@RequestBody pathogen: Pathogen): Pathogen {
+        return pathogenService.createPathogenWithGivenName(pathogen)
     }
 }
