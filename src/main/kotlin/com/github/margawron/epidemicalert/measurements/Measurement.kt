@@ -1,6 +1,7 @@
 package com.github.margawron.epidemicalert.measurements
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.margawron.epidemicalert.common.LatLng
 import com.github.margawron.epidemicalert.device.Device
 import com.github.margawron.epidemicalert.users.User
 import java.time.Instant
@@ -41,4 +42,6 @@ class Measurement(
     @ManyToOne
     @JoinColumn(name = "msr_dev_id", nullable = false)
     var originOfMeasurement: Device
-)
+) {
+    fun toLatLng() = LatLng(latitude, longitude)
+}
