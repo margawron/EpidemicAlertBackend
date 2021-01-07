@@ -35,8 +35,13 @@ class SuspectService(
             dto.suspicionLevel,
             suspectedUser,
             pathogen,
-            listOf()
+            mutableListOf()
         )
+        return suspectRepository.save(suspect)
+    }
+
+    @Transactional
+    fun saveSuspect(suspect: Suspect): Suspect {
         return suspectRepository.save(suspect)
     }
 

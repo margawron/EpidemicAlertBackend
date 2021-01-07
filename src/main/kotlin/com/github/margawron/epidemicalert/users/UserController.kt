@@ -34,11 +34,4 @@ class UserController(
         val savedUser = userService.saveUser(user)
         return UserDto.fromEntity(savedUser)
     }
-
-    @GetMapping("/test")
-    @PreAuthorize("@permissionEvaluator.any()")
-    fun test(): String{
-        pushService.sendNotification()
-        return "test"
-    }
 }

@@ -1,12 +1,10 @@
 package com.github.margawron.epidemicalert.suspects
 
+import com.github.margawron.epidemicalert.alerts.AlertService
 import com.github.margawron.epidemicalert.common.GeoUtils
 import com.github.margawron.epidemicalert.measurements.Measurement
 import com.github.margawron.epidemicalert.measurements.MeasurementService
-import com.github.margawron.epidemicalert.notifications.PushService
-import com.github.margawron.epidemicalert.pathogens.PathogenService
 import com.github.margawron.epidemicalert.users.User
-import com.github.margawron.epidemicalert.users.UserService
 import org.springframework.beans.factory.config.ConfigurableBeanFactory
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
@@ -18,11 +16,9 @@ import kotlin.math.max
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Component
 class SuspectProximityAnalyzingTask(
-    private val userService: UserService,
+    private val alertService: AlertService,
     private val measurementService: MeasurementService,
-    private val pushService: PushService,
-    private val pathogenService: PathogenService,
-
+    private val suspectService: SuspectService,
 ) : Runnable {
 
     lateinit var suspect:Suspect
@@ -35,6 +31,7 @@ class SuspectProximityAnalyzingTask(
         for(potentialVictim in potentialVictims){
             checkVictimForProximity(potentialVictim, startTime, endTime)
         }
+        suspectService.saveSuspect(suspect)
     }
 
     private fun checkVictimForProximity(victim: User, startMoment:Instant, endMoment: Instant){
@@ -60,7 +57,8 @@ class SuspectProximityAnalyzingTask(
     }
 
     fun checkProximityForDay(victim: User, suspectMeasurements: List<Measurement>, suspectLastMeasurement: Measurement, victimMeasurements: List<Measurement>, victimLastMeasurement: Measurement){
-        val setOfProxymities = mutableSetOf<Measurement>()
+        val victimSetOfProximities = mutableSetOf<Measurement>()
+        val suspectSetOfProximities = mutableSetOf<Measurement>()
         var lastSuspectMeasurement = suspectLastMeasurement
         for(suspectMeasurement in suspectMeasurements){
             val suspectTimeDiff = Duration.between(lastSuspectMeasurement.timestamp, suspectMeasurement.timestamp)
@@ -86,8 +84,10 @@ class SuspectProximityAnalyzingTask(
                         val lerpedVictimLatLng = GeoUtils.getPointInDirectionToBearing(lastVictimMeasurement.toLatLng(), victimBearing, victimIterationDistance)
                         val distanceBetweenLerps = GeoUtils.getMetersDistanceBetween(lerpedSuspectLatLng, lerpedVictimLatLng)
                         if(distanceBetweenLerps <= suspectAccuracy + victimAccuracy + suspect.pathogen.accuracy + suspect.pathogen.detectionRange){
-                            setOfProxymities.add(lastVictimMeasurement)
-                            setOfProxymities.add(victimMeasurement)
+                            victimSetOfProximities.add(lastVictimMeasurement)
+                            victimSetOfProximities.add(victimMeasurement)
+                            suspectSetOfProximities.add(lastSuspectMeasurement)
+                            suspectSetOfProximities.add(suspectMeasurement)
                         }
                     }
                     lastVictimMeasurement = victimMeasurement
@@ -96,10 +96,9 @@ class SuspectProximityAnalyzingTask(
 
             lastSuspectMeasurement = suspectMeasurement
         }
-        if (setOfProxymities.isNotEmpty()){
-            TODO("Alert user")
-            victim
-
+        if(victimSetOfProximities.isNotEmpty()) {
+            val alert = alertService.createAlert(victim, suspect, victimSetOfProximities, suspectSetOfProximities)
+            suspect.alerts.add(alert)
         }
     }
 
