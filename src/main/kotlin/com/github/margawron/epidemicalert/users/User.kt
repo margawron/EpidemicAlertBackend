@@ -1,18 +1,19 @@
 package com.github.margawron.epidemicalert.users
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.margawron.epidemicalert.alerts.Alert
 import com.github.margawron.epidemicalert.converters.AccountStateConverter
 import com.github.margawron.epidemicalert.converters.RoleConverter
 import com.github.margawron.epidemicalert.device.Device
 import com.github.margawron.epidemicalert.measurements.Measurement
-import java.security.Principal
+import com.github.margawron.epidemicalert.suspects.Suspect
 import java.time.Instant
 import javax.persistence.*
 
 
 @Entity
 @Table(name = "t_users")
-class User(
+data class User(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,9 +48,11 @@ class User(
     var userDevices: Set<Device> = mutableSetOf(),
 
     @OneToMany(mappedBy = "ownerOfMeasurement")
-    var userMeasurementHistory: Set<Measurement> = mutableSetOf()
-) {
-    override fun hashCode(): Int {
-        return this.id?.toInt() ?: 0
-    }
-}
+    var userMeasurementHistory: Set<Measurement> = mutableSetOf(),
+
+    @OneToMany(mappedBy = "victim")
+    var userAlerts: Set<Alert> = mutableSetOf(),
+
+    @OneToMany(mappedBy = "suspect")
+    var userSuspicions: Set<Suspect> = mutableSetOf()
+)

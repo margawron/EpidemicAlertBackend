@@ -7,7 +7,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "t_devices")
-class Device(
+data class Device(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,9 +32,5 @@ class Device(
     var deviceOwner: User,
 
     @OneToMany(mappedBy = "originOfMeasurement")
-    var deviceMeasurements: Set<Measurement> = mutableSetOf()
-) {
-    override fun hashCode(): Int {
-        return this.id?.toInt() ?: 0
-    }
-}
+    var deviceMeasurements: Set<Measurement> = emptySet()
+)

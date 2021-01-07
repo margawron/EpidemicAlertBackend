@@ -6,7 +6,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "t_zones")
-class Zone (
+data class Zone (
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

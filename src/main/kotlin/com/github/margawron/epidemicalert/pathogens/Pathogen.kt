@@ -7,7 +7,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "t_pathogens")
-class Pathogen (
+data class Pathogen (
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

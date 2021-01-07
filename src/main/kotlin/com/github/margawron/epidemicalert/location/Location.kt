@@ -7,7 +7,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "t_locations")
-class Location(
+data class Location(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

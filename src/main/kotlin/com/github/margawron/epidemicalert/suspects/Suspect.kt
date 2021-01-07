@@ -10,7 +10,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "t_suspects")
-class Suspect (
+data class Suspect (
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

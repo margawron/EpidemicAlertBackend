@@ -9,7 +9,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "t_location_measurements")
-class Measurement(
+data class Measurement(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,8 +44,4 @@ class Measurement(
     var originOfMeasurement: Device
 ) {
     fun toLatLng() = LatLng(latitude, longitude)
-
-    override fun hashCode(): Int {
-        return this.id?.toInt() ?: 0
-    }
 }

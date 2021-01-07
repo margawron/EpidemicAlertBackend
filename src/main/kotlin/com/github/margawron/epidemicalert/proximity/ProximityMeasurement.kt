@@ -8,7 +8,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "t_proximity_measurements")
-class ProximityMeasurement(
+data class ProximityMeasurement(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
