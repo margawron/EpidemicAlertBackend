@@ -32,5 +32,5 @@ data class Device(
     var deviceOwner: User,
 
     @OneToMany(mappedBy = "originOfMeasurement")
-    var deviceMeasurements: Set<Measurement> = emptySet()
+    var deviceMeasurements: MutableSet<Measurement> = mutableSetOf()
 )

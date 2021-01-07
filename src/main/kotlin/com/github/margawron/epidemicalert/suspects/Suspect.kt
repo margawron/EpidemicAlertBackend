@@ -33,6 +33,6 @@ data class Suspect (
     @ManyToOne(targetEntity = Pathogen::class)
     val pathogen: Pathogen,
 
-    @OneToMany(mappedBy = "suspect")
-    val alerts: List<Alert>
+    @OneToMany(mappedBy = "suspect", cascade = [CascadeType.ALL])
+    val alerts: MutableList<Alert> = mutableListOf()
 )

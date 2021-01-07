@@ -1,6 +1,7 @@
 package com.github.margawron.epidemicalert.alerts
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.margawron.epidemicalert.proximity.ProximityMeasurement
 import com.github.margawron.epidemicalert.suspects.Suspect
 import com.github.margawron.epidemicalert.users.User
 import javax.persistence.*
@@ -21,5 +22,8 @@ data class Alert (
 
     @JoinColumn(name = "alr_usr_id")
     @ManyToOne
-    val victim: User
+    val victim: User,
+
+    @OneToMany(mappedBy = "alert", cascade = [CascadeType.ALL])
+    val proximityMeasurements: MutableSet<ProximityMeasurement> = mutableSetOf()
 )
