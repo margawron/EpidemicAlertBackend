@@ -37,40 +37,52 @@ class SuspectProximityAnalyzingTask(
     private fun checkVictimForProximity(victim: User, startMoment:Instant, endMoment: Instant){
         var first = startMoment
         var second = getNextTimeIteration(startMoment, ChronoUnit.DAYS, endMoment)
-        lateinit var suspectLastMeasurement: Measurement
-        lateinit var victimLastMeasurement: Measurement
+        lateinit var suspectFirstMeasurement: Measurement
+        lateinit var victimFirstMeasurement: Measurement
         while(second.plusMillis(1).isBefore(endMoment)){
             val suspectMeasurements = measurementService.getMeasurementsForUserBetweenInstants(suspect.suspect, first, second)
             val victimMeasurements = measurementService.getMeasurementsForUserBetweenInstants(victim, first, second)
+            if(suspectMeasurements.isEmpty() || victimMeasurements.isEmpty()){
+                first = second
+                second = getNextTimeIteration(second, ChronoUnit.DAYS, endMoment)
+                continue
+            }
             if (first == startMoment){
-                suspectLastMeasurement = suspectMeasurements.removeAt(0)
-                victimLastMeasurement = victimMeasurements.removeAt(0)
+                suspectFirstMeasurement = suspectMeasurements.removeAt(0)
+                victimFirstMeasurement = victimMeasurements.removeAt(0)
             }
 
-            checkProximityForDay(victim, suspectMeasurements, suspectLastMeasurement, victimMeasurements, victimLastMeasurement)
+            checkProximityForDay(victim, suspectMeasurements, suspectFirstMeasurement, victimMeasurements, victimFirstMeasurement)
 
-            suspectLastMeasurement = suspectMeasurements.last()
-            victimLastMeasurement = victimMeasurements.last()
+            suspectFirstMeasurement = suspectMeasurements.last()
+            victimFirstMeasurement = victimMeasurements.last()
             first = second
             second = getNextTimeIteration(second, ChronoUnit.DAYS, endMoment)
         }
     }
 
-    fun checkProximityForDay(victim: User, suspectMeasurements: List<Measurement>, suspectLastMeasurement: Measurement, victimMeasurements: List<Measurement>, victimLastMeasurement: Measurement){
+    fun checkProximityForDay(
+        victim: User,
+        suspectMeasurements: List<Measurement>,
+        suspectLastMeasurement: Measurement,
+        victimMeasurements: List<Measurement>,
+        victimLastMeasurement: Measurement
+    ) {
+        // TODO check if list are one element only
         val victimSetOfProximities = mutableSetOf<Measurement>()
         val suspectSetOfProximities = mutableSetOf<Measurement>()
         var lastSuspectMeasurement = suspectLastMeasurement
         for(suspectMeasurement in suspectMeasurements){
             val suspectTimeDiff = Duration.between(lastSuspectMeasurement.timestamp, suspectMeasurement.timestamp)
             val suspectDistance = GeoUtils.getMetersDistanceBetween(lastSuspectMeasurement.toLatLng(), suspectMeasurement.toLatLng())
-            val suspectBearing = GeoUtils.getBearingBetween(lastSuspectMeasurement.toLatLng(), suspectLastMeasurement.toLatLng())
-            val x = 30
+            val suspectBearingRad = GeoUtils.getBearingBetween(lastSuspectMeasurement.toLatLng(), suspectMeasurement.toLatLng())
+            val x = 5
             val suspectMetersPerXSeconds = (suspectDistance/suspectTimeDiff.seconds)*x
             val suspectIterations = suspectTimeDiff.seconds % x
             val suspectAccuracy = max(lastSuspectMeasurement.accuracy, suspectMeasurement.accuracy)
             for(i in 0..suspectIterations){
                 val suspectIterationDistance = suspectMetersPerXSeconds*i
-                val lerpedSuspectLatLng = GeoUtils.getPointInDirectionToBearing(lastSuspectMeasurement.toLatLng(), suspectBearing, suspectIterationDistance)
+                val lerpedSuspectLatLng = GeoUtils.getPointInDirectionToBearing(lastSuspectMeasurement.toLatLng(), suspectBearingRad, suspectIterationDistance)
                 var lastVictimMeasurement = victimLastMeasurement
                 for (victimMeasurement in victimMeasurements){
                     val victimTimeDiff = Duration.between(lastVictimMeasurement.timestamp, victimMeasurement.timestamp)

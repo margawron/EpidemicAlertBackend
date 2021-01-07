@@ -1,6 +1,5 @@
 package com.github.margawron.epidemicalert.common
 
-import com.github.margawron.epidemicalert.measurements.Measurement
 import kotlin.math.*
 
 object GeoUtils {
@@ -20,35 +19,39 @@ object GeoUtils {
     fun getMetersDistanceBetween(first: LatLng, second: LatLng): Double{
         val lat1 = first.latitude * degToRad
         val lat2 = second.latitude * degToRad
-        val dLat = (first.latitude - second.latitude) * degToRad
-        val dLng = (first.longitude - second.longitude) * degToRad
+        val dLat = (second.latitude - first.latitude) * degToRad
+        val dLng = (second.longitude - first.longitude) * degToRad
 
         // Kwadrat połowy długości cięciwy
-        val halvedLengthChordSquared = sin(dLat / 2) * sin(dLng / 2) +
-                cos(lat1) * cos(lat2) +
-                sin(dLng / 2) * sin(dLng / 2)
-        val angularDistance = 2 * atan2(sqrt(halvedLengthChordSquared), sqrt(1-halvedLengthChordSquared))
-        return earthRadius * angularDistance
+        val a = sin(dLat / 2) * sin(dLat / 2) + cos(lat1) * cos(lat2) * sin(dLng / 2) * sin(dLng / 2)
+        // Zmiana kąta (droga/kąt)
+        val c = 2 * atan2(sqrt(a), sqrt(1-a))
+        return earthRadius * c
     }
-
+    //
     fun getBearingBetween(first: LatLng, second: LatLng): Double {
-        val x = sin(second.longitude - first.longitude) * cos(second.latitude)
-        val y = cos(first.latitude) * sin(second.latitude) -
-                sin(first.latitude) * cos(second.latitude) * cos(second.longitude-first.longitude)
+        val lat1 = first.latitude * degToRad
+        val lon1 = first.longitude * degToRad
+        val lat2 = second.latitude * degToRad
+        val lon2 = second.longitude * degToRad
+        val x = sin(lon2 - lon1) * cos(lat2)
+        val y = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lon2 - lon1)
         val bearingInRad = atan2(y, x)
         return bearingInRad
     }
 
-    fun getPointInDirectionToBearing(measurement: LatLng, bearing: Double, distanceInMeters: Double): LatLng {
-        val latOther = asin(
-            sin(measurement.latitude) * cos(distanceInMeters / earthRadius) +
-                    cos(measurement.latitude) * sin(distanceInMeters / earthRadius) * cos(bearing)
+    fun getPointInDirectionToBearing(measurement: LatLng, bearingRad: Double, distanceInMeters: Double): LatLng {
+        val lat = measurement.latitude * degToRad
+        val lon = measurement.longitude * degToRad
+        val otherLat = asin(
+            sin(lat) * cos(distanceInMeters / earthRadius) +
+                    cos(lat) * sin(distanceInMeters / earthRadius) * cos(bearingRad)
         )
-        val lngOther = measurement.longitude + atan2(
-            sin(bearing) * sin(distanceInMeters / earthRadius) * cos(measurement.latitude),
-            cos(distanceInMeters / earthRadius) - sin(measurement.latitude) * sin(latOther)
+        val otherLng = lon + atan2(
+            sin(bearingRad) * sin(distanceInMeters / earthRadius) * cos(lat),
+            cos(distanceInMeters / earthRadius) - sin(lat) * sin(otherLat)
         )
-        return LatLng(latOther, lngOther)
+        return LatLng(otherLat * radToDeg, otherLng * radToDeg)
     }
 
 }
