@@ -3,7 +3,7 @@ package com.github.margawron.epidemicalert.suspects
 import com.github.margawron.epidemicalert.pathogens.PathogenService
 import com.github.margawron.epidemicalert.users.UserService
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.context.support.AbstractApplicationContext
+import org.springframework.context.ApplicationContext
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -15,7 +15,7 @@ class SuspectService(
     private val suspectRepository: SuspectRepository,
     @Qualifier("alertingSystemTaskExecutor")
     private val threadPoolTaskExecutor: ThreadPoolTaskExecutor,
-    private val applicationContext: AbstractApplicationContext
+    private val applicationContext: ApplicationContext
 ) {
 
     fun createAndRunAlertingTask(dto: SuspectDto){

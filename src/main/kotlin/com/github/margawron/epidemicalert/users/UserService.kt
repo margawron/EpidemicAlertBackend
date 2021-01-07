@@ -43,7 +43,7 @@ class UserService(
 
     fun findAndCheckUserCredentials(loginDto: LoginDto): User {
         val user: User = userRepository.findByUserName(loginDto.login) ?: throw ErrorCodeWithFieldException(
-            NoSuchElementException::class,
+            loginDto::class,
             "user.username.not_exists",
             arrayOf(loginDto.login),
             "login"
