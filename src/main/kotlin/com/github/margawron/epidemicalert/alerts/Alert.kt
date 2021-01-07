@@ -25,5 +25,5 @@ data class Alert (
     val victim: User,
 
     @OneToMany(mappedBy = "alert", cascade = [CascadeType.ALL])
-    val proximityMeasurements: MutableSet<ProximityMeasurement> = mutableSetOf()
+    val proximityMeasurements: MutableList<ProximityMeasurement> = mutableListOf()
 )

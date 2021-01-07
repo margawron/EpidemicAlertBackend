@@ -45,14 +45,14 @@ data class User(
     var accountState: AccountState = AccountState.NORMAL,
 
     @OneToMany(mappedBy = "deviceOwner")
-    var userDevices: MutableSet<Device> = mutableSetOf(),
+    var userDevices: MutableList<Device> = mutableListOf(),
 
     @OneToMany(mappedBy = "ownerOfMeasurement")
-    var userMeasurementHistory: MutableSet<Measurement> = mutableSetOf(),
+    var userMeasurementHistory: MutableList<Measurement> = mutableListOf(),
 
     @OneToMany(mappedBy = "victim")
-    var userAlerts: MutableSet<Alert> = mutableSetOf(),
+    var userAlerts: MutableList<Alert> = mutableListOf(),
 
     @OneToMany(mappedBy = "suspect")
-    var userSuspicions: MutableSet<Suspect> = mutableSetOf()
+    var userSuspicions: MutableList<Suspect> = mutableListOf()
 )
