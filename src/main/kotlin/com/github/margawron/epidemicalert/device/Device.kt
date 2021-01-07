@@ -32,5 +32,9 @@ class Device(
     var deviceOwner: User,
 
     @OneToMany(mappedBy = "originOfMeasurement")
-    var deviceMeasurements: Set<Measurement> = emptySet()
-)
+    var deviceMeasurements: Set<Measurement> = mutableSetOf()
+) {
+    override fun hashCode(): Int {
+        return this.id?.toInt() ?: 0
+    }
+}

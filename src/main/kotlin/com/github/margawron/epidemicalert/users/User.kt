@@ -48,4 +48,8 @@ class User(
 
     @OneToMany(mappedBy = "ownerOfMeasurement")
     var userMeasurementHistory: Set<Measurement> = mutableSetOf()
-)
+) {
+    override fun hashCode(): Int {
+        return this.id?.toInt() ?: 0
+    }
+}

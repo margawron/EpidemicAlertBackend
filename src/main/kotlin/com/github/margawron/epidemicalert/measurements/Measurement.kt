@@ -44,4 +44,8 @@ class Measurement(
     var originOfMeasurement: Device
 ) {
     fun toLatLng() = LatLng(latitude, longitude)
+
+    override fun hashCode(): Int {
+        return this.id?.toInt() ?: 0
+    }
 }
