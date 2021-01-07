@@ -5,6 +5,9 @@ import com.github.margawron.epidemicalert.exceptions.ErrorCodeException
 import com.github.margawron.epidemicalert.suspects.Suspect
 import com.github.margawron.epidemicalert.users.User
 import com.github.margawron.epidemicalert.users.UserService
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.context.ApplicationContext
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -51,6 +54,7 @@ class MeasurementService(
         var second = getNextTimeIteration(startMoment, ChronoUnit.DAYS, endMoment)
         while(second.plusMillis(1).isBefore(endMoment)){
             val usersWithMeasurementsInbounds = userDiscoveryIteration(suspect, first, second)
+                .filter { it.id != suspect.suspect.id  }
 
             first = second
             second = getNextTimeIteration(second, ChronoUnit.DAYS, endMoment)
@@ -59,6 +63,7 @@ class MeasurementService(
         }
 
         val usersWithMeasurementsInbounds = userDiscoveryIteration(suspect, first, second)
+            .filter { it.id != suspect.suspect.id  }
         setOfUsers.addAll(usersWithMeasurementsInbounds)
 
         return setOfUsers
@@ -69,24 +74,37 @@ class MeasurementService(
         first: Instant,
         second: Instant
     ): List<User> {
-        val iterationTopRightMeasurement =
-            measurementRepository.findFirstByOwnerOfMeasurementAndTimestampAfterAndTimestampBeforeOrderByLongitudeDescLatitudeDesc(
+        val iterationTopMeasurement =
+            measurementRepository.findFirstByOwnerOfMeasurementAndTimestampAfterAndTimestampBeforeOrderByLatitudeDesc(
                 suspect.suspect,
                 first,
                 second
             )
-        val iterationBottomLeftMeasurement =
-            measurementRepository.findFirstByOwnerOfMeasurementAndTimestampAfterAndTimestampBeforeOrderByLongitudeAscLatitudeAsc(
+        val iterationRightMeasurement =
+            measurementRepository.findFirstByOwnerOfMeasurementAndTimestampAfterAndTimestampBeforeOrderByLongitudeDesc(
                 suspect.suspect,
                 first,
                 second
             )
-        return if (iterationTopRightMeasurement == null || iterationBottomLeftMeasurement == null) emptyList()
+        val iterationBottomMeasurement =
+            measurementRepository.findFirstByOwnerOfMeasurementAndTimestampAfterAndTimestampBeforeOrderByLatitudeAsc(
+                suspect.suspect,
+                first,
+                second
+            )
+        val iterationLeftMeasurement =
+            measurementRepository.findFirstByOwnerOfMeasurementAndTimestampAfterAndTimestampBeforeOrderByLongitudeAsc(
+                suspect.suspect,
+                first,
+                second
+            )
+        return if (iterationTopMeasurement == null || iterationRightMeasurement == null ||
+                iterationLeftMeasurement == null || iterationBottomMeasurement == null) emptyList()
         else measurementRepository.findAllUsersInbounds(
-            iterationTopRightMeasurement.latitude,
-            iterationTopRightMeasurement.longitude,
-            iterationBottomLeftMeasurement.latitude,
-            iterationBottomLeftMeasurement.longitude
+            iterationTopMeasurement.latitude,
+            iterationRightMeasurement.longitude,
+            iterationBottomMeasurement.latitude,
+            iterationLeftMeasurement.longitude
         )
     }
 
