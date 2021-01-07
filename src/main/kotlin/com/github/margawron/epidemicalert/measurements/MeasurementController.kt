@@ -18,7 +18,7 @@ class MeasurementController(
 ) {
 
     @PostMapping("measurement")
-    @PreAuthorize("@permissionEvaluator.isUser(authentication)")
+    @PreAuthorize("@permissionEvaluator.isRegistered(authentication)")
     fun saveUserMeasurements(
         auth: Authentication,
         @RequestParam(name = "deviceId") deviceId: Long, @RequestBody @Valid measurementsDto: List<MeasurementDto>
