@@ -71,7 +71,8 @@ class SuspectProximityAnalyzingTask(
             val suspectIterations = suspectTimeDiff.seconds % x
             val suspectAccuracy = max(lastSuspectMeasurement.accuracy, suspectMeasurement.accuracy)
             for(i in 0..suspectIterations){
-                val lerpedSuspectLatLng = GeoUtils.getPointInDirectionToBearing(lastSuspectMeasurement.toLatLng(), suspectBearing, suspectMetersPerXSeconds)
+                val suspectIterationDistance = suspectMetersPerXSeconds*i
+                val lerpedSuspectLatLng = GeoUtils.getPointInDirectionToBearing(lastSuspectMeasurement.toLatLng(), suspectBearing, suspectIterationDistance)
                 var lastVictimMeasurement = victimLastMeasurement
                 for (victimMeasurement in victimMeasurements){
                     val victimTimeDiff = Duration.between(lastVictimMeasurement.timestamp, victimMeasurement.timestamp)
@@ -81,7 +82,8 @@ class SuspectProximityAnalyzingTask(
                     val victimIterations = victimTimeDiff.seconds % x
                     val victimAccuracy = max(lastSuspectMeasurement.accuracy, suspectMeasurement.accuracy)
                     for(j in 0..victimIterations){
-                        val lerpedVictimLatLng = GeoUtils.getPointInDirectionToBearing(lastVictimMeasurement.toLatLng(), victimBearing, victimMetersPerXSeconds)
+                        val victimIterationDistance = victimMetersPerXSeconds*j
+                        val lerpedVictimLatLng = GeoUtils.getPointInDirectionToBearing(lastVictimMeasurement.toLatLng(), victimBearing, victimIterationDistance)
                         val distanceBetweenLerps = GeoUtils.getMetersDistanceBetween(lerpedSuspectLatLng, lerpedVictimLatLng)
                         if(distanceBetweenLerps <= suspectAccuracy + victimAccuracy + suspect.pathogen.accuracy + suspect.pathogen.detectionRange){
                             setOfProxymities.add(lastVictimMeasurement)
@@ -96,6 +98,7 @@ class SuspectProximityAnalyzingTask(
         }
         if (setOfProxymities.isNotEmpty()){
             TODO("Alert user")
+            victim
 
         }
     }
