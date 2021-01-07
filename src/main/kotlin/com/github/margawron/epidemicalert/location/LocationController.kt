@@ -27,6 +27,6 @@ class LocationController(
     @PreAuthorize("@permissionEvaluator.isAdmin(authentication)")
     fun removeLocation(@PathVariable("id") locationId: Long): ResponseEntity<Any> {
         locationService.deleteById(locationId)
-        return ResponseEntity.ok().build()
+        return ResponseEntity.ok(locationId)
     }
 }

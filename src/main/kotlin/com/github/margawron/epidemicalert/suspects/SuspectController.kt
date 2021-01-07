@@ -15,6 +15,6 @@ class SuspectController(
     @PreAuthorize("@permissionEvaluator.isModerator(authentication)")
     fun reportSuspectedUser(@RequestBody suspectDto: SuspectDto): ResponseEntity<Any> {
         suspectService.createAndRunAlertingTask(suspectDto)
-        return ResponseEntity.ok().build()
+        return ResponseEntity.ok(suspectDto)
     }
 }
