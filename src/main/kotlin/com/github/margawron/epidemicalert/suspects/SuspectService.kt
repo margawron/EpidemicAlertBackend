@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
 
 @Service
 class SuspectService(
@@ -17,6 +18,10 @@ class SuspectService(
     private val threadPoolTaskExecutor: ThreadPoolTaskExecutor,
     private val applicationContext: ApplicationContext
 ) {
+
+    fun getCountOfSuspectsBetweenTimestamps(after: Instant, before: Instant): Long {
+        return suspectRepository.countAllByStartTimeAfterAndStartTimeBefore(after, before)
+    }
 
     fun createAndRunAlertingTask(dto: SuspectDto){
         val suspect = createSuspectFromDto(dto)
