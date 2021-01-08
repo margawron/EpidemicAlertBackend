@@ -17,7 +17,7 @@ data class ProximityMeasurement(
     val id: Long?,
 
     @JoinColumn(name = "prx_msr_id")
-    @ManyToOne(targetEntity = Measurement::class)
+    @OneToOne
     val measurement: Measurement,
 
     @JoinColumn(name = "prx_alr_id")
