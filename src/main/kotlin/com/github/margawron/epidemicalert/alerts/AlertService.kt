@@ -1,5 +1,6 @@
 package com.github.margawron.epidemicalert.alerts
 
+import com.github.margawron.epidemicalert.exceptions.ErrorCodeException
 import com.github.margawron.epidemicalert.measurements.Measurement
 import com.github.margawron.epidemicalert.notifications.PushService
 import com.github.margawron.epidemicalert.proximity.ProximityMeasurement
@@ -13,6 +14,8 @@ class AlertService(
     private val alertRepository: AlertRepository,
     private val pushService: PushService,
 ) {
+
+    fun getAlertById(alertId: Long): Alert = alertRepository.findById(alertId).orElse(null) ?: throw ErrorCodeException(this::class, "alert.given_id_does_not_exist")
 
 
     fun createAlert(
@@ -48,5 +51,4 @@ class AlertService(
         pushService.sendNotification(savedAlert)
         return savedAlert
     }
-
 }
