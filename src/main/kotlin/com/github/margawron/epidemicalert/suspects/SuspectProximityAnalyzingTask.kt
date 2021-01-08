@@ -8,6 +8,7 @@ import com.github.margawron.epidemicalert.users.User
 import org.springframework.beans.factory.config.ConfigurableBeanFactory
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -23,6 +24,7 @@ class SuspectProximityAnalyzingTask(
 
     lateinit var suspect:Suspect
 
+    @Transactional
     override fun run() {
         val pathogen = suspect.pathogen
         val startTime = suspect.startTime
@@ -105,7 +107,6 @@ class SuspectProximityAnalyzingTask(
                     lastVictimMeasurement = victimMeasurement
                 }
             }
-
             lastSuspectMeasurement = suspectMeasurement
         }
         if(victimSetOfProximities.isNotEmpty()) {
