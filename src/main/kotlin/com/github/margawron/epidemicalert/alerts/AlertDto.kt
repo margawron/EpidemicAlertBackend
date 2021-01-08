@@ -3,13 +3,18 @@ package com.github.margawron.epidemicalert.alerts
 import com.github.margawron.epidemicalert.exceptions.ErrorCodeException
 import com.github.margawron.epidemicalert.proximity.ProximityMeasurementDto
 import com.github.margawron.epidemicalert.proximity.ProximityType
+import com.github.margawron.epidemicalert.suspects.SuspicionLevel
 import com.github.margawron.epidemicalert.users.User
 import kotlin.jvm.Throws
 
 data class AlertDto(
     var id: Long,
     var proximityType: ProximityType,
+    var suspicionLevel: SuspicionLevel,
+    var pathogenId: Long,
+    var victimId: Long,
     var victimMeasurements: MutableList<ProximityMeasurementDto>,
+    var suspectId: Long,
     var suspectMeasurements: MutableList<ProximityMeasurementDto>,
 ){
     companion object{
@@ -17,11 +22,14 @@ data class AlertDto(
         @Throws(ErrorCodeException::class)
         fun fromEntityForUser(alert: Alert, user: User) : AlertDto {
             val id = alert.id!!
+            val suspect = alert.suspect
+            val suspectedUser = suspect.suspect
+            val victimUser = alert.victim
             val proximityType: ProximityType = when {
-                alert.victim.id == user.id -> {
+                victimUser.id == user.id -> {
                     ProximityType.VICTIM
                 }
-                alert.suspect.suspect.id == user.id -> {
+                suspectedUser.id == user.id -> {
                     ProximityType.SUSPECT
                 }
                 else -> {
@@ -39,7 +47,11 @@ data class AlertDto(
             return AlertDto(
                 id,
                 proximityType,
+                suspect.suspicionLevel,
+                suspect.pathogen.id!!,
+                victimUser.id!!,
                 victimMeasurements.toMutableList(),
+                suspectedUser.id!!,
                 suspectMeasurements.toMutableList(),
             )
         }
