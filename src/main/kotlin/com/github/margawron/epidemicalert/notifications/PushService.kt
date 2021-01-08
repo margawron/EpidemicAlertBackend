@@ -7,6 +7,7 @@ import com.github.margawron.epidemicalert.proximity.ProximityType
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import com.google.firebase.messaging.Notification
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -16,14 +17,17 @@ class PushService(
     val objectMapper: ObjectMapper,
 ) {
 
-    val log = LoggerFactory.getLogger(PushService::class.java)
+    val log: Logger = LoggerFactory.getLogger(PushService::class.java)
 
     fun sendNotification(alert: Alert){
 
         val victimAlertBody = AlertDto(
             alert.id!!,
-            ProximityType.VICTIM
+            ProximityType.VICTIM,
+            mutableListOf(),
+            mutableListOf()
         )
+        val dataMap = mutableMapOf("id" to alert.id.toString(), "proximityType" to ProximityType.VICTIM.toString())
         val notification = Notification("Alert", objectMapper.writeValueAsString(victimAlertBody))
         val victimDevices = alert.victim.userDevices
         for(device in victimDevices){
@@ -31,6 +35,7 @@ class PushService(
                 val message = Message.builder()
                     .setToken(device.firebaseToken)
                     .setNotification(notification)
+                    .putAllData(dataMap)
                     .build()
                 log.debug("OE", "Pre push notification sent")
                 FirebaseMessaging.getInstance().send(message)
