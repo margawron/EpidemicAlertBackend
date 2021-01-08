@@ -8,6 +8,7 @@ import com.github.margawron.epidemicalert.proximity.ProximityType
 import com.github.margawron.epidemicalert.suspects.Suspect
 import com.github.margawron.epidemicalert.users.User
 import org.springframework.stereotype.Service
+import java.time.Instant
 
 @Service
 class AlertService(
@@ -27,7 +28,8 @@ class AlertService(
         val alert = Alert(
             null,
             suspect,
-            victim
+            victim,
+            Instant.now()
         )
         val victimProximities = victimSetOfProximities.map {
             ProximityMeasurement(
