@@ -2,18 +2,23 @@ package com.github.margawron.epidemicalert.suspects
 
 import com.github.margawron.epidemicalert.alerts.AlertService
 import com.github.margawron.epidemicalert.common.GeoUtils
+import com.github.margawron.epidemicalert.common.LatLng
+import com.github.margawron.epidemicalert.common.PageableIterator
 import com.github.margawron.epidemicalert.measurements.Measurement
 import com.github.margawron.epidemicalert.measurements.MeasurementService
+import com.github.margawron.epidemicalert.pathogens.Pathogen
 import com.github.margawron.epidemicalert.users.User
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.config.ConfigurableBeanFactory
 import org.springframework.context.annotation.Scope
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
 import java.time.Instant
-import java.time.temporal.ChronoUnit
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import kotlin.math.max
 
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -24,106 +29,178 @@ class SuspectProximityAnalyzingTask(
     private val suspectService: SuspectService,
 ) : Runnable {
 
-    companion object{
-        val log : Logger = LoggerFactory.getLogger(SuspectProximityAnalyzingTask::class.java)
+    companion object {
+        val log: Logger = LoggerFactory.getLogger(SuspectProximityAnalyzingTask::class.java)
     }
 
-    lateinit var suspect:Suspect
+    lateinit var suspect: Suspect
+    lateinit var suspicionStartTime: Instant
+    lateinit var suspicionEndTime: Instant
 
     @Transactional
     override fun run() {
         val pathogen = suspect.pathogen
-        val startTime = suspect.startTime
-        val endTime = startTime.plus(pathogen.contagiousPeriod.toLong(), pathogen.contagiousPeriodResolution.chronoUnit)
-        val potentialVictims = measurementService.findUsersInSuspectMeasurementsBoundingBox(suspect, startTime, endTime)
-        for(potentialVictim in potentialVictims){
-            checkVictimForProximity(potentialVictim, startTime, endTime)
+        suspicionStartTime = suspect.startTime
+        suspicionEndTime = suspicionStartTime.plus(pathogen.contagiousPeriod.toLong(), pathogen.contagiousPeriodResolution.chronoUnit)
+        val potentialVictims = measurementService.findUsersInSuspectMeasurementsBoundingBox(suspect, suspicionStartTime, suspicionEndTime)
+        for (potentialVictim in potentialVictims) {
+            prepareData(potentialVictim)
         }
         suspectService.saveSuspect(suspect)
     }
 
-    private fun checkVictimForProximity(victim: User, startMoment:Instant, endMoment: Instant){
-        var first = startMoment
-        var second = getNextTimeIteration(startMoment, ChronoUnit.DAYS, endMoment)
-        var areFirstMeasurementsInitialized = false
-        lateinit var suspectFirstMeasurement: Measurement
-        lateinit var victimFirstMeasurement: Measurement
-        while(second.plusMillis(1).isBefore(endMoment)){
-            val suspectMeasurements = measurementService.getMeasurementsForUserBetweenInstants(suspect.suspect, first, second)
-            val victimMeasurements = measurementService.getMeasurementsForUserBetweenInstants(victim, first, second)
-            if(suspectMeasurements.isEmpty() || victimMeasurements.isEmpty()){
-                first = second
-                second = getNextTimeIteration(second, ChronoUnit.DAYS, endMoment)
-                continue
-            }
-            if (!areFirstMeasurementsInitialized){
-                suspectFirstMeasurement = suspectMeasurements.removeAt(0)
-                victimFirstMeasurement = victimMeasurements.removeAt(0)
-                areFirstMeasurementsInitialized = true
-            }
-
-            checkProximityForDay(victim, suspectMeasurements, suspectFirstMeasurement, victimMeasurements, victimFirstMeasurement)
-
-            suspectFirstMeasurement = suspectMeasurements.last()
-            victimFirstMeasurement = victimMeasurements.last()
-            first = second
-            second = getNextTimeIteration(second, ChronoUnit.DAYS, endMoment)
+    private fun prepareData(victim: User) {
+        val pageRequest = PageRequest.of(0, 500)
+        val suspectMeasurementsIterator = PageableIterator(pageRequest) {
+            measurementService.getMeasurementsForUserBetweenInstants(suspect.suspect, suspicionStartTime, suspicionEndTime, it)
         }
+        val victimMeasurementsIterator = PageableIterator(pageRequest) {
+            measurementService.getMeasurementsForUserBetweenInstants(victim, suspicionStartTime, suspicionEndTime, it)
+        }
+        log.info("Got ${suspectMeasurementsIterator.getTotalElements()} elements for suspect and ${victimMeasurementsIterator.getTotalElements()} for victim")
+        // Should be at least one for each one
+        var suspectTailingMeasurement = suspectMeasurementsIterator.next()
+        var victimTailingMeasurement = victimMeasurementsIterator.next()
+        // Nothing really to measure
+        if(suspectMeasurementsIterator.getTotalElements() <= 2L || victimMeasurementsIterator.getTotalElements() <= 2L){
+            log.info("Too little elements to start")
+            return
+        }
+        lateinit var startInstant: Instant
+        if (victimTailingMeasurement.timestamp.isAfter(suspectTailingMeasurement.timestamp)) {
+            // Advance suspect
+            val tailingMeasurement =
+                advanceIteratorAfterTimestampAndReturnTailing(suspectMeasurementsIterator, victimTailingMeasurement)
+                    ?: return
+            suspectTailingMeasurement = tailingMeasurement
+            startInstant = victimTailingMeasurement.timestamp
+        } else {
+            // Advance victim
+            val tailingMeasurement =
+                advanceIteratorAfterTimestampAndReturnTailing(victimMeasurementsIterator, suspectTailingMeasurement)
+                    ?: return
+            victimTailingMeasurement = tailingMeasurement
+            startInstant = suspectTailingMeasurement.timestamp
+        }
+        log.info("Starting at: ${startInstant.atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_DATE_TIME)} time point")
+        log.info("First victim measurement is: ${victimTailingMeasurement.latitude} ${victimTailingMeasurement.longitude}")
+        log.info("First suspect measurement is: ${suspectTailingMeasurement.latitude} ${suspectTailingMeasurement.longitude}")
+        interpolateMeasurements(victim, startInstant, suspectTailingMeasurement, suspectMeasurementsIterator, victimTailingMeasurement, victimMeasurementsIterator)
     }
 
-    fun checkProximityForDay(
+    private fun advanceIteratorAfterTimestampAndReturnTailing(iterator: PageableIterator<Measurement>, advanceJustAfter: Measurement): Measurement?{
+        while(iterator.hasNext()){
+            val tailingMeasurement = iterator.next()
+            if (advanceJustAfter.timestamp.isBefore(tailingMeasurement.timestamp)){
+                return tailingMeasurement
+            }
+        }
+        return null
+    }
+
+    private fun interpolateMeasurements(
         victim: User,
-        suspectMeasurements: List<Measurement>,
+        timestampImpositionStartInstant: Instant,
         suspectLastMeasurement: Measurement,
-        victimMeasurements: List<Measurement>,
-        victimLastMeasurement: Measurement
+        suspectMeasurementsIterator: PageableIterator<Measurement>,
+        victimLastMeasurement: Measurement,
+        victimMeasurementsIterator: PageableIterator<Measurement>
     ) {
-        val victimSetOfProximities = mutableSetOf<Measurement>()
-        val suspectSetOfProximities = mutableSetOf<Measurement>()
-        var lastSuspectMeasurement = suspectLastMeasurement
-        for(suspectMeasurement in suspectMeasurements){
-            var lastVictimMeasurement = victimLastMeasurement
-            for (victimMeasurement in victimMeasurements){
-                val victimInterpolationIterator = MeasurementInterpolationIterator(lastVictimMeasurement, victimMeasurement)
-                val victimAccuracy = max(lastVictimMeasurement.accuracy, victimMeasurement.accuracy)
-                val suspectInterpolationIterator = MeasurementInterpolationIterator(lastSuspectMeasurement, suspectMeasurement)
-                val suspectAccuracy = max(lastSuspectMeasurement.accuracy, suspectMeasurement.accuracy)
-                if(isInProximity(suspectInterpolationIterator, victimInterpolationIterator, suspectAccuracy, victimAccuracy)){
-                    victimSetOfProximities.add(lastVictimMeasurement)
-                    victimSetOfProximities.add(victimMeasurement)
-                    suspectSetOfProximities.add(lastSuspectMeasurement)
-                    suspectSetOfProximities.add(suspectMeasurement)
-                }
-                lastVictimMeasurement = victimMeasurement
+        var firstSuspectMeasurement = suspectLastMeasurement
+        var secondSuspectMeasurement = suspectMeasurementsIterator.next()
+        var firstVictimMeasurement = victimLastMeasurement
+        var secondVictimMeasurement = victimMeasurementsIterator.next()
+
+        var measuredInstant = timestampImpositionStartInstant
+        var startOfDay = measuredInstant.atOffset(ZoneOffset.UTC)
+            .toLocalDate().atStartOfDay()
+        var endOfDay = startOfDay.plusDays(1)
+
+        var suspectAlertMeasurements: MutableSet<Measurement> = mutableSetOf()
+        var victimAlertMeasurements: MutableSet<Measurement> = mutableSetOf()
+        val pathogen: Pathogen = suspect.pathogen
+
+        var insertFollowingSuspectMeasurement = false
+        var insertFollowingVictimMeasurement = false
+
+        // Main interpolation loop
+        while(measuredInstant.isBefore(suspicionEndTime)){
+            // Change daily bounds/send alert
+            if(measuredInstant.isAfter(endOfDay.toInstant(ZoneOffset.UTC))){
+                createAlertForVictim(victim, victimAlertMeasurements, suspectAlertMeasurements)
+                endOfDay = startOfDay
+                startOfDay = startOfDay.plusDays(1)
+                suspectAlertMeasurements = mutableSetOf()
+                victimAlertMeasurements = mutableSetOf()
             }
-            lastSuspectMeasurement = suspectMeasurement
+            // Measurements are old, fetch next
+            if(measuredInstant.isAfter(secondSuspectMeasurement.timestamp) && suspectMeasurementsIterator.hasNext()){
+                firstSuspectMeasurement = secondSuspectMeasurement
+                secondSuspectMeasurement = suspectMeasurementsIterator.next()
+                if(insertFollowingSuspectMeasurement){
+                    suspectAlertMeasurements.add(secondSuspectMeasurement)
+                    insertFollowingSuspectMeasurement = false
+                }
+            } else if(!suspectMeasurementsIterator.hasNext()){
+                // No new measurements
+                break
+            }
+            // Measurements are old, fetch next
+            if(measuredInstant.isAfter(secondVictimMeasurement.timestamp) && victimMeasurementsIterator.hasNext()){
+                firstVictimMeasurement = secondVictimMeasurement
+                secondVictimMeasurement = victimMeasurementsIterator.next()
+                if(insertFollowingVictimMeasurement){
+                    victimAlertMeasurements.add(secondSuspectMeasurement)
+                    insertFollowingVictimMeasurement = false
+                }
+            }else if(!victimMeasurementsIterator.hasNext()) {
+                // No new measurements
+                break
+            }
+            val suspectLatLng = getLatLngForInstantBetweenLocations(firstSuspectMeasurement, secondSuspectMeasurement, measuredInstant)
+            val suspectAccuracy = max(firstSuspectMeasurement.accuracy, secondSuspectMeasurement.accuracy)
+            val victimLatLng = getLatLngForInstantBetweenLocations(firstVictimMeasurement, secondVictimMeasurement, measuredInstant)
+            val victimAccuracy = max(firstVictimMeasurement.accuracy, secondVictimMeasurement.accuracy)
+
+            val maximalError = suspectAccuracy + victimAccuracy + pathogen.detectionRange + pathogen.detectionRange
+            val distanceBetweenInterpolations = GeoUtils.getMetersDistanceBetween(suspectLatLng, victimLatLng)
+            if(distanceBetweenInterpolations <= maximalError){
+                suspectAlertMeasurements.add(firstSuspectMeasurement)
+                suspectAlertMeasurements.add(secondSuspectMeasurement)
+                victimAlertMeasurements.add(firstVictimMeasurement)
+                victimAlertMeasurements.add(secondVictimMeasurement)
+                insertFollowingSuspectMeasurement = true
+                insertFollowingVictimMeasurement = true
+            }
+            // Increase time interval
+            measuredInstant = measuredInstant.plusSeconds(2)
         }
-        if(victimSetOfProximities.isNotEmpty()) {
-            val alert = alertService.createAlert(victim, suspect, victimSetOfProximities, suspectSetOfProximities)
-            suspect.alerts.add(alert)
+        if(suspectAlertMeasurements.isNotEmpty() || victimAlertMeasurements.isNotEmpty()){
+            createAlertForVictim(victim, victimAlertMeasurements, suspectAlertMeasurements)
         }
     }
 
-    private fun isInProximity(
-        suspectLatLngInterpolations: MeasurementInterpolationIterator,
-        victimLatLngInterpolations: MeasurementInterpolationIterator,
-        suspectAccuracy: Float,
-        victimAccuracy: Float
-    ): Boolean {
-        for (suspectLatLng in suspectLatLngInterpolations) {
-            for (victimLatLng in victimLatLngInterpolations) {
-                val distanceBetweenLerps = GeoUtils.getMetersDistanceBetween(suspectLatLng, victimLatLng)
-                if (distanceBetweenLerps < 50.0) {
-                    log.info("Got: $distanceBetweenLerps for suspect: ${suspectLatLng.latitude} ${suspectLatLng.longitude} victim: ${victimLatLng.latitude} ${victimLatLng.longitude}")
-                }
-                return (distanceBetweenLerps <= suspectAccuracy + victimAccuracy + suspect.pathogen.accuracy + suspect.pathogen.detectionRange)
-            }
-        }
-        return false
+    private fun getLatLngForInstantBetweenLocations(
+        first: Measurement,
+        second: Measurement,
+        measuredInstant: Instant
+    ): LatLng {
+        val firstLatLng = first.toLatLng()
+        val secondLatLng = second.toLatLng()
+        val bearing = GeoUtils.getBearingBetween(firstLatLng, secondLatLng)
+        val distance = GeoUtils.getMetersDistanceBetween(firstLatLng, secondLatLng)
+
+        val duration = Duration.between(first.timestamp, measuredInstant)
+        val distanceFromFirst = distance / duration.seconds
+        return GeoUtils.getPointInDirectionToBearing(firstLatLng, bearing, distanceFromFirst)
     }
 
-    fun getNextTimeIteration(start: Instant, resolution: ChronoUnit, upperMargin: Instant): Instant{
-        val nextIter = start.plus(1, resolution)
-        return if(nextIter.plusMillis(1).isAfter(upperMargin)) upperMargin else nextIter
+    private fun createAlertForVictim(
+        victim: User,
+        victimAlertMeasurements: MutableSet<Measurement>,
+        suspectAlertMeasurements: MutableSet<Measurement>
+    ) {
+        alertService.createAlert(victim, suspect, victimAlertMeasurements, suspectAlertMeasurements)
     }
+
 }

@@ -1,6 +1,8 @@
 package com.github.margawron.epidemicalert.measurements
 
 import com.github.margawron.epidemicalert.users.User
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
@@ -40,5 +42,5 @@ interface MeasurementRepository : JpaRepository<Measurement, Long> {
     @Query("SELECT DISTINCT m.ownerOfMeasurement FROM Measurement m WHERE m.latitude < :trLat AND m.latitude > :blLat AND m.longitude < :trLng AND m.longitude > :blLng")
     fun findAllUsersInbounds(trLat: Double, trLng: Double, blLat: Double, blLng: Double): List<User>
 
-    fun findAllByOwnerOfMeasurementAndTimestampAfterAndTimestampBeforeOrderByTimestampAsc(user: User, startInstant: Instant, endInstant: Instant): MutableList<Measurement>
+    fun findAllByOwnerOfMeasurementAndTimestampAfterAndTimestampBeforeOrderByTimestampAsc(user: User, startInstant: Instant, endInstant: Instant, pageable: Pageable): Page<Measurement>
 }
