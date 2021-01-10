@@ -5,6 +5,7 @@ import com.github.margawron.epidemicalert.proximity.ProximityMeasurementDto
 import com.github.margawron.epidemicalert.proximity.ProximityType
 import com.github.margawron.epidemicalert.suspects.SuspicionLevel
 import com.github.margawron.epidemicalert.users.User
+import java.time.Instant
 import kotlin.jvm.Throws
 
 data class AlertDto(
@@ -13,9 +14,10 @@ data class AlertDto(
     var suspicionLevel: SuspicionLevel,
     var pathogenId: Long,
     var victimId: Long,
-    var victimMeasurements: MutableList<ProximityMeasurementDto>,
+    var victimMeasurements: List<ProximityMeasurementDto>,
     var suspectId: Long,
-    var suspectMeasurements: MutableList<ProximityMeasurementDto>,
+    var suspectMeasurements: List<ProximityMeasurementDto>,
+    var alertCreationInstant: Instant,
 ){
     companion object{
 
@@ -53,6 +55,7 @@ data class AlertDto(
                 victimMeasurements.toMutableList(),
                 suspectedUser.id!!,
                 suspectMeasurements.toMutableList(),
+                alert.creationInstant
             )
         }
     }
