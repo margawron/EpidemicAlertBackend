@@ -21,14 +21,8 @@ class PushService(
 
     fun sendNotification(alert: Alert){
 
-        val victimAlertBody = AlertDto(
-            alert.id!!,
-            ProximityType.VICTIM,
-            mutableListOf(),
-            mutableListOf()
-        )
         val dataMap = mutableMapOf("id" to alert.id.toString(), "proximityType" to ProximityType.VICTIM.toString())
-        val notification = Notification("Alert", objectMapper.writeValueAsString(victimAlertBody))
+        val notification = Notification("Alert", "")
         val victimDevices = alert.victim.userDevices
         for(device in victimDevices){
             try {
