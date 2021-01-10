@@ -45,6 +45,7 @@ class SuspectProximityAnalyzingTask(
     private fun checkVictimForProximity(victim: User, startMoment:Instant, endMoment: Instant){
         var first = startMoment
         var second = getNextTimeIteration(startMoment, ChronoUnit.DAYS, endMoment)
+        var areFirstMeasurementsInitialized = false
         lateinit var suspectFirstMeasurement: Measurement
         lateinit var victimFirstMeasurement: Measurement
         while(second.plusMillis(1).isBefore(endMoment)){
@@ -55,9 +56,10 @@ class SuspectProximityAnalyzingTask(
                 second = getNextTimeIteration(second, ChronoUnit.DAYS, endMoment)
                 continue
             }
-            if (first == startMoment){
+            if (!areFirstMeasurementsInitialized){
                 suspectFirstMeasurement = suspectMeasurements.removeAt(0)
                 victimFirstMeasurement = victimMeasurements.removeAt(0)
+                areFirstMeasurementsInitialized = true
             }
 
             checkProximityForDay(victim, suspectMeasurements, suspectFirstMeasurement, victimMeasurements, victimFirstMeasurement)
