@@ -16,7 +16,7 @@ data class Location(
     val id: Long?,
 
     @Column(name = "loc_expiry_date")
-    val expiryDate: Instant,
+    val expiryDate: Instant?,
 
     @Column(name = "loc_latitude")
     val latitude: Double,

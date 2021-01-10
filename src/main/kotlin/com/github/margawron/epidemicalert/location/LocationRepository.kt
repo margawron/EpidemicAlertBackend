@@ -5,5 +5,5 @@ import java.time.Instant
 
 interface LocationRepository : JpaRepository<Location, Long> {
 
-    fun findAllByLatitudeLessThanEqualAndLatitudeGreaterThanEqualAndLongitudeLessThanEqualAndLongitudeGreaterThanEqualAndExpiryDateBefore(maxLat: Double, minLat: Double, maxLng: Double, minLng: Double, expiryDate: Instant): List<Location>
+    fun findAllByLatitudeLessThanEqualAndLatitudeGreaterThanEqualAndLongitudeLessThanEqualAndLongitudeGreaterThanEqualAndExpiryDateBeforeOrExpiryDateIsNull(maxLat: Double, minLat: Double, maxLng: Double, minLng: Double, expiryDate: Instant): List<Location>
 }

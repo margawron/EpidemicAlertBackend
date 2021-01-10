@@ -22,7 +22,7 @@ class LocationService(
         val minLng = lng - dLng
         val maxLng = lng + dLng
 
-        return locationRepository.findAllByLatitudeLessThanEqualAndLatitudeGreaterThanEqualAndLongitudeLessThanEqualAndLongitudeGreaterThanEqualAndExpiryDateBefore(maxLat, minLat, maxLng, minLng, Instant.now())
+        return locationRepository.findAllByLatitudeLessThanEqualAndLatitudeGreaterThanEqualAndLongitudeLessThanEqualAndLongitudeGreaterThanEqualAndExpiryDateBeforeOrExpiryDateIsNull(maxLat, minLat, maxLng, minLng, Instant.now())
     }
 
     fun createAndSaveLocationFromDto(dto: LocationDto): Location{
