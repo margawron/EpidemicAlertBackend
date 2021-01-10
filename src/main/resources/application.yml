@@ -13,6 +13,11 @@ epidemicalert:
   token:
     expiryTime: 28800 # 8 hours
 
+logging:
+  level: info
+  file:
+    name: oe.log
+
 app:
   firebase-configuration-file:
     firebase-sdk-config.json

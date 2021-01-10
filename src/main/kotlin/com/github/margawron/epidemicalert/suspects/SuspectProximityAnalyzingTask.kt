@@ -5,6 +5,8 @@ import com.github.margawron.epidemicalert.common.GeoUtils
 import com.github.margawron.epidemicalert.measurements.Measurement
 import com.github.margawron.epidemicalert.measurements.MeasurementService
 import com.github.margawron.epidemicalert.users.User
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.config.ConfigurableBeanFactory
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
@@ -21,6 +23,10 @@ class SuspectProximityAnalyzingTask(
     private val measurementService: MeasurementService,
     private val suspectService: SuspectService,
 ) : Runnable {
+
+    companion object{
+        val log : Logger = LoggerFactory.getLogger(SuspectProximityAnalyzingTask::class.java)
+    }
 
     lateinit var suspect:Suspect
 
@@ -70,42 +76,23 @@ class SuspectProximityAnalyzingTask(
         victimMeasurements: List<Measurement>,
         victimLastMeasurement: Measurement
     ) {
-        // TODO check if list are one element only
         val victimSetOfProximities = mutableSetOf<Measurement>()
         val suspectSetOfProximities = mutableSetOf<Measurement>()
         var lastSuspectMeasurement = suspectLastMeasurement
         for(suspectMeasurement in suspectMeasurements){
-            val suspectTimeDiff = Duration.between(lastSuspectMeasurement.timestamp, suspectMeasurement.timestamp)
-            val suspectDistance = GeoUtils.getMetersDistanceBetween(lastSuspectMeasurement.toLatLng(), suspectMeasurement.toLatLng())
-            val suspectBearingRad = GeoUtils.getBearingBetween(lastSuspectMeasurement.toLatLng(), suspectMeasurement.toLatLng())
-            val x = 5
-            val suspectMetersPerXSeconds = (suspectDistance/suspectTimeDiff.seconds)*x
-            val suspectIterations = suspectTimeDiff.seconds % x
-            val suspectAccuracy = max(lastSuspectMeasurement.accuracy, suspectMeasurement.accuracy)
-            for(i in 0..suspectIterations){
-                val suspectIterationDistance = suspectMetersPerXSeconds*i
-                val lerpedSuspectLatLng = GeoUtils.getPointInDirectionToBearing(lastSuspectMeasurement.toLatLng(), suspectBearingRad, suspectIterationDistance)
-                var lastVictimMeasurement = victimLastMeasurement
-                for (victimMeasurement in victimMeasurements){
-                    val victimTimeDiff = Duration.between(lastVictimMeasurement.timestamp, victimMeasurement.timestamp)
-                    val victimDistance = GeoUtils.getMetersDistanceBetween(lastVictimMeasurement.toLatLng(), victimMeasurement.toLatLng())
-                    val victimBearing = GeoUtils.getBearingBetween(lastVictimMeasurement.toLatLng(), victimMeasurement.toLatLng())
-                    val victimMetersPerXSeconds = (victimDistance/victimTimeDiff.seconds)*x
-                    val victimIterations = victimTimeDiff.seconds % x
-                    val victimAccuracy = max(lastSuspectMeasurement.accuracy, suspectMeasurement.accuracy)
-                    for(j in 0..victimIterations){
-                        val victimIterationDistance = victimMetersPerXSeconds*j
-                        val lerpedVictimLatLng = GeoUtils.getPointInDirectionToBearing(lastVictimMeasurement.toLatLng(), victimBearing, victimIterationDistance)
-                        val distanceBetweenLerps = GeoUtils.getMetersDistanceBetween(lerpedSuspectLatLng, lerpedVictimLatLng)
-                        if(distanceBetweenLerps <= suspectAccuracy + victimAccuracy + suspect.pathogen.accuracy + suspect.pathogen.detectionRange){
-                            victimSetOfProximities.add(lastVictimMeasurement)
-                            victimSetOfProximities.add(victimMeasurement)
-                            suspectSetOfProximities.add(lastSuspectMeasurement)
-                            suspectSetOfProximities.add(suspectMeasurement)
-                        }
-                    }
-                    lastVictimMeasurement = victimMeasurement
+            var lastVictimMeasurement = victimLastMeasurement
+            for (victimMeasurement in victimMeasurements){
+                val victimInterpolationIterator = MeasurementInterpolationIterator(lastVictimMeasurement, victimMeasurement)
+                val victimAccuracy = max(lastVictimMeasurement.accuracy, victimMeasurement.accuracy)
+                val suspectInterpolationIterator = MeasurementInterpolationIterator(lastSuspectMeasurement, suspectMeasurement)
+                val suspectAccuracy = max(lastSuspectMeasurement.accuracy, suspectMeasurement.accuracy)
+                if(isInProximity(suspectInterpolationIterator, victimInterpolationIterator, suspectAccuracy, victimAccuracy)){
+                    victimSetOfProximities.add(lastVictimMeasurement)
+                    victimSetOfProximities.add(victimMeasurement)
+                    suspectSetOfProximities.add(lastSuspectMeasurement)
+                    suspectSetOfProximities.add(suspectMeasurement)
                 }
+                lastVictimMeasurement = victimMeasurement
             }
             lastSuspectMeasurement = suspectMeasurement
         }
@@ -113,6 +100,24 @@ class SuspectProximityAnalyzingTask(
             val alert = alertService.createAlert(victim, suspect, victimSetOfProximities, suspectSetOfProximities)
             suspect.alerts.add(alert)
         }
+    }
+
+    private fun isInProximity(
+        suspectLatLngInterpolations: MeasurementInterpolationIterator,
+        victimLatLngInterpolations: MeasurementInterpolationIterator,
+        suspectAccuracy: Float,
+        victimAccuracy: Float
+    ): Boolean {
+        for (suspectLatLng in suspectLatLngInterpolations) {
+            for (victimLatLng in victimLatLngInterpolations) {
+                val distanceBetweenLerps = GeoUtils.getMetersDistanceBetween(suspectLatLng, victimLatLng)
+                if (distanceBetweenLerps < 50.0) {
+                    log.info("Got: $distanceBetweenLerps for suspect: ${suspectLatLng.latitude} ${suspectLatLng.longitude} victim: ${victimLatLng.latitude} ${victimLatLng.longitude}")
+                }
+                return (distanceBetweenLerps <= suspectAccuracy + victimAccuracy + suspect.pathogen.accuracy + suspect.pathogen.detectionRange)
+            }
+        }
+        return false
     }
 
     fun getNextTimeIteration(start: Instant, resolution: ChronoUnit, upperMargin: Instant): Instant{
