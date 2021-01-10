@@ -2,7 +2,7 @@ package com.github.margawron.epidemicalert.location
 
 import com.github.margawron.epidemicalert.common.GeoUtils
 import org.springframework.stereotype.Service
-
+import java.time.Instant
 
 
 @Service
@@ -22,7 +22,7 @@ class LocationService(
         val minLng = lng - dLng
         val maxLng = lng + dLng
 
-        return locationRepository.findAllByLatitudeLessThanEqualAndLatitudeGreaterThanEqualAndLongitudeLessThanEqualAndLongitudeGreaterThanEqual(maxLat, minLat, maxLng, minLng)
+        return locationRepository.findAllByLatitudeLessThanEqualAndLatitudeGreaterThanEqualAndLongitudeLessThanEqualAndLongitudeGreaterThanEqualAndExpiryDateBefore(maxLat, minLat, maxLng, minLng, Instant.now())
     }
 
     fun createAndSaveLocationFromDto(dto: LocationDto): Location{
