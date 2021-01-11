@@ -19,7 +19,7 @@ class AlertService(
     fun getAlertById(alertId: Long): Alert = alertRepository.findById(alertId).orElse(null) ?: throw ErrorCodeException(this::class, "alert.given_id_does_not_exist")
 
     fun getAlertCountBeforeTimestampAndAfterTimestamp(after: Instant, before: Instant): Long {
-        return alertRepository.countAlertsByCreationInstantAfterAndCreationInstantBefore(after, before)
+        return alertRepository.countAllByCreationInstantAfterAndCreationInstantBefore(after, before)
     }
 
     fun createAlert(

@@ -4,10 +4,8 @@ import com.github.margawron.epidemicalert.common.IdMapping
 import com.github.margawron.epidemicalert.exceptions.ErrorCodeException
 import com.github.margawron.epidemicalert.suspects.Suspect
 import com.github.margawron.epidemicalert.users.User
-import com.github.margawron.epidemicalert.users.UserService
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.context.ApplicationContext
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -15,7 +13,6 @@ import javax.transaction.Transactional
 
 @Service
 class MeasurementService(
-    private val userService: UserService,
     private val measurementRepository: MeasurementRepository,
 ) {
 
@@ -44,7 +41,6 @@ class MeasurementService(
                 incomingId = it.clientSideId,
                 outgoingId = savedMeasurement.id!!
             )
-            // TODO validate if user had contact with infected
         }
     }
 
@@ -113,7 +109,7 @@ class MeasurementService(
         return if(nextIter.plusMillis(1).isAfter(upperMargin)) upperMargin else nextIter
     }
 
-    fun getMeasurementsForUserBetweenInstants(user: User, startInstant: Instant, endInstant: Instant): MutableList<Measurement> {
-        return measurementRepository.findAllByOwnerOfMeasurementAndTimestampAfterAndTimestampBeforeOrderByTimestampAsc(user, startInstant, endInstant)
+    fun getMeasurementsForUserBetweenInstants(user: User, startInstant: Instant, endInstant: Instant, pageable: Pageable): Page<Measurement> {
+        return measurementRepository.findAllByOwnerOfMeasurementAndTimestampAfterAndTimestampBeforeOrderByTimestampAsc(user, startInstant, endInstant, pageable)
     }
 }

@@ -5,6 +5,6 @@ import java.time.Instant
 
 interface AlertRepository : JpaRepository<Alert, Long> {
 
-    fun countAlertsByCreationInstantAfterAndCreationInstantBefore(after: Instant, before: Instant): Long
+    fun countAllByCreationInstantAfterAndCreationInstantBefore(after: Instant, before: Instant): Long
 
 }
