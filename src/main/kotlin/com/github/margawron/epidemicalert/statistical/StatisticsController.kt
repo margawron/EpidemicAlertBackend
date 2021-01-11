@@ -20,8 +20,8 @@ class StatisticsController(
     @PreAuthorize("@permissionEvaluator.isRegistered(authentication)")
     fun getStatisticsForLastMonth(): Map<String,StatisticsDto> {
         val today = LocalDate.now(ZoneOffset.UTC).atStartOfDay()
-        val upperBound = today.plusDays(1)
-        val lowerBound = today.minusMonths(1)
+        val upperBound = today.plusDays(2)
+        val lowerBound = upperBound.minusMonths(1)
         val dayToStatistics = mutableMapOf<String, StatisticsDto>()
         var iterationLowerBound = lowerBound
         var iterationUpperBound = iterationLowerBound.plusDays(1)
@@ -32,7 +32,7 @@ class StatisticsController(
             val suspectCount = suspectService.getCountOfSuspectsBetweenTimestamps(
                 iterationLowerBound.toInstant(ZoneOffset.UTC),
                 iterationUpperBound.toInstant(ZoneOffset.UTC))
-            val dayString = iterationUpperBound.format(DateTimeFormatter.ISO_DATE)
+            val dayString = iterationLowerBound.format(DateTimeFormatter.ISO_DATE)
             dayToStatistics[dayString] = StatisticsDto(suspectCount, alertCount)
             iterationLowerBound = iterationUpperBound
             iterationUpperBound = iterationLowerBound.plusDays(1)
