@@ -40,7 +40,7 @@ object GeoUtils {
         return bearingInRad
     }
 
-    fun getPointInDirectionToBearing(measurement: LatLng, bearingRad: Double, distanceInMeters: Double): LatLng {
+    fun getPointInDirectionOfBearing(measurement: LatLng, bearingRad: Double, distanceInMeters: Double): LatLng {
         val lat = measurement.latitude * degToRad
         val lon = measurement.longitude * degToRad
         val otherLat = asin(

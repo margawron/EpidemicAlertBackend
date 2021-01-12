@@ -192,7 +192,7 @@ class SuspectProximityAnalyzingTask(
 
         val duration = Duration.between(first.timestamp, measuredInstant)
         val distanceFromFirst = distance / duration.seconds
-        return GeoUtils.getPointInDirectionToBearing(firstLatLng, bearing, distanceFromFirst)
+        return GeoUtils.getPointInDirectionOfBearing(firstLatLng, bearing, distanceFromFirst)
     }
 
     private fun createAlertForVictim(
